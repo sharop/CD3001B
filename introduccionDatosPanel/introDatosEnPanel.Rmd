@@ -1,0 +1,191 @@
+---
+title: "Introducción a Datos en Panel y Series de Tiempo"
+output: 
+  html_document:
+    css: bootstrap.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(tsibble)
+library(lubridate)
+library(hrbrthemes)
+library(tsibbledata)
+thematic::thematic_rmd()
+
+```
+
+<hr>
+
+<center>
+
+### Análisis de Datos en Panel
+
+</center>
+
+## {.tabset}
+
+### Algunos Recursos
+
+* OpenIntro Statistics: https://stat.duke.edu/books/openintro-statistics
+* Rob J Hyndman (In Hyndsight) https://robjhyndman.com/
+* Series de Tiempo y Modelos de Pronóstico: https://michaela-kratofil.com/files/2009_Book_IntroductoryTimeSeriesWithR.pdf
+* Algunas funciones en R para series de tiemp: https://nicholasrjenkins.science/post/tidy_time_series/tts_r/
+* Bases de datos: https://stat2labs.sites.grinnell.edu/DataResources.html
+
+```{r AirPassengers, message=FALSE, error=FALSE}
+
+AP <- AirPassengers
+AP
+
+```
+
+```{r message=FALSE, error=FALSE}
+
+UD <- USAccDeaths
+  UD
+
+```
+
+```{r message=FALSE, error=FALSE}
+
+pedestrian %>% 
+    head %>% 
+     kable(
+       .,
+    format = "html",
+    booktabs = TRUE) %>%
+    kable_styling(font_size = 12) %>% 
+    scroll_box(width="100%")
+
+```
+
+```{r message=FALSE, error=FALSE}
+
+tsibbledata::ansett %>% 
+  head %>% 
+     kable(
+       .,
+    format = "html",
+    booktabs = TRUE) %>%
+    kable_styling(font_size = 12) %>% 
+    scroll_box(width="100%")
+
+```
+
+```{r message=FALSE, error=FALSE}
+
+tsibbledata::aus_livestock %>% 
+  head %>% 
+     kable(
+       .,
+    format = "html",
+    booktabs = TRUE) %>%
+    kable_styling(font_size = 12) %>% 
+    scroll_box(width="100%")
+
+```
+
+```{r message=FALSE, error=FALSE}
+
+tsibbledata::aus_production %>% 
+  head %>% 
+     kable(
+       .,
+    format = "html",
+    booktabs = TRUE) %>%
+    kable_styling(font_size = 12) %>% 
+    scroll_box(width="100%")
+
+```
+
+
+### Wrangling
+
+```{r  message=FALSE, error=FALSE}
+
+tsibble::tourism %>% 
+    head %>% 
+     kable(
+       .,
+    format = "html",
+    booktabs = TRUE) %>%
+    kable_styling(font_size = 12) %>% 
+    scroll_box(width="100%")
+
+```
+
+
+```{r message=FALSE, error=FALSE}
+
+tsibble::tourism %>%
+  filter(
+    Purpose == "Holiday") %>%
+  group_by(State) %>%
+  summarise(
+    Trips = sum(Trips)
+    ) %>%
+  head() %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>% 
+  scroll_box(width = "100%")
+
+```
+
+
+```{r message=FALSE, error=FALSE}
+
+tsibble::tourism %>%
+  mutate(Year = lubridate::year(Quarter)) %>%
+  index_by(Year) %>%
+  group_by(Region, State, Purpose) %>%
+  summarise(Trips = sum(Trips)) %>%
+  ungroup() %>% 
+  head() %>% 
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+```
+
+```{r message=FALSE, error=FALSE, fig.show='hold',out.width="130%"}
+tsibble::pedestrian %>%
+  mutate(
+    Day = lubridate::wday(Date, label = TRUE),
+    Weekend = (Day %in% c("Sun", "Sat"))
+  ) %>%
+  ggplot(aes(x = Time, y = Count, group = Date)) +
+    geom_line(aes(col = Weekend)) +
+    scale_color_ipsum() +
+    theme_ipsum() +
+    theme(legend.position = "bottom") +
+    facet_wrap(Sensor ~ .)
+
+# https://robjhyndman.com/hyndsight/tsibbles/
+
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="130%"}
+
+olympic_running %>% 
+ggplot(aes(x=Year, y = Time, colour = Sex)) +
+  geom_line() +
+  geom_point(size = 1) +
+  facet_wrap(~ Length, scales = "free_y", nrow = 2) + 
+  theme_ipsum() + 
+  scale_color_ipsum()  + 
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1, size=9),
+        axis.text.y = element_text(size=9),
+        legend.title = element_blank()) +
+  ylab("Running time (seconds)")
+
+# https://tsibbledata.tidyverts.org/
+```

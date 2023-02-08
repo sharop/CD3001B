@@ -19,11 +19,12 @@ ui <-
                  verbatimTextOutput("show_string")
                )),
                br(),
-               br(),
                fluidRow(column(
-                 12, align = "center",
-                 imageOutput("cover")
-               ))),
+                 12,
+                 align = "center",
+                 img(src = "caricatura_correlacion.png")
+               ))
+      ),
       tabPanel(
         "Introducción",
         strong(h1("Chat-GPT Say Whaaaat?")),
