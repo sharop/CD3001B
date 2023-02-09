@@ -7,6 +7,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 library(knitr)
 library(tidyverse)
 library(kableExtra)
@@ -14,6 +15,8 @@ library(tsibble)
 library(lubridate)
 library(hrbrthemes)
 library(tsibbledata)
+library(wesanderson)
+library(mxmaps)
 thematic::thematic_rmd()
 
 ```
@@ -41,7 +44,7 @@ thematic::thematic_rmd()
 * Bases de datos: https://stat2labs.sites.grinnell.edu/DataResources.html
   
 * Visualización de datos en R: https://r-graph-gallery.com/
-
+  
 ```{r AirPassengers, message=FALSE, error=FALSE}
 
 AP <- AirPassengers
@@ -153,13 +156,13 @@ tsibble::tourism %>%
 
 ```
 
-```{r message=FALSE, error=FALSE, fig.show='hold',out.width="120%"}
+```{r message=FALSE, error=FALSE, fig.show='hold',out.width="105%"}
 tsibble::pedestrian %>%
   mutate(Day = lubridate::wday(Date, label = TRUE),
          Weekend = (Day %in% c("Sun", "Sat"))) %>%
   ggplot(aes(x = Time, y = Count, group = Date,col = Weekend)) +
-  geom_line(alpha=0.8) +
-  scale_colour_manual(name = '', values = c("#2171B5", '#FFC300')) +
+  geom_line(alpha=0.2) +
+  scale_colour_manual(name = '', values = c('#00B2A8','#1C2D44')) +
   theme_ipsum() +
   theme(legend.position = "bottom") +
   facet_wrap(Sensor ~ .)
@@ -168,14 +171,14 @@ tsibble::pedestrian %>%
 
 ```
 
-```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="120%"}
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
 
 olympic_running %>%
   ggplot(aes(x = Year, y = Time, colour = Sex)) +
-  geom_line(alpha=0.8) +
+  geom_line(alpha=0.6) +
   facet_wrap( ~ Length, scales = "free_y", nrow = 2) +
   theme_ipsum() +
-  scale_colour_manual(name = '', values = c("#2171B5", '#FFC300')) +
+  scale_colour_manual(name = '', values = c('#00B2A8','#1C2D44')) +
   theme(
     legend.position = "bottom",
     axis.text.x = element_text(
@@ -192,7 +195,7 @@ olympic_running %>%
 # https://tsibbledata.tidyverts.org/
 ```
 
-```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="120%"}
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
 
 AP %>%
   as_tsibble() %>%
@@ -206,7 +209,316 @@ AP %>%
   )) +
   geom_line(alpha = .8) +
   theme_ipsum() +
+  scale_colour_manual(name = '', values = colorRampPalette(wes_palettes$GrandBudapest2)(12)) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom') +
+  ylab('monthly air passengers')
+
+```
+
+### Ejemplo
+
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
+
+# read datasets
+
+df_inv <- 
+  read_csv('juguetes_mexico_dataset/inventory.csv')
+
+df_prod <- 
+  read_csv('juguetes_mexico_dataset/products.csv')
+
+df_sales <- 
+  read_csv('juguetes_mexico_dataset/sales.csv')
+
+df_stores <- 
+  read_csv('juguetes_mexico_dataset/stores.csv')
+
+# check out data sets 
+
+df_inv %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+df_prod %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+df_sales %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+df_stores %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+```
+  
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
+# join relevant tables
+
+df <- 
+df_prod %>% 
+  left_join(df_sales,
+            by='Product_ID') %>% 
+  left_join(df_stores,
+            by='Store_ID')
+
+
+## revenue report -- revenue as metric
+
+rev_report <-
+df %>% 
+  mutate(
+    Product_Price = str_remove(Product_Price, "\\$") %>% as.numeric(),
+    Product_Cost =  str_remove(Product_Cost, "\\$") %>% as.numeric(),
+  ) %>% 
+  group_by(
+    Date,
+    Product_Category,
+    Product_Cost,
+    Product_Price
+  ) %>% 
+  summarise(
+    costs = sum(Product_Cost),
+    sales = sum(Product_Price),
+    items_sold = n(),
+    total_revenue = sales - costs
+  ) 
+
+## geo report -- revenue as metric
+
+geo_report <-
+  df %>% 
+  mutate(
+    Product_Price = str_remove(Product_Price, "\\$") %>% as.numeric(),
+    Product_Cost =  str_remove(Product_Cost, "\\$") %>% as.numeric(),
+  ) %>% 
+  group_by(
+    Date,
+    Store_City,
+    Store_Location,
+  ) %>% 
+  summarise(
+    costs = sum(Product_Cost),
+    sales = sum(Product_Price),
+    items_sold = n(),
+    total_revenue = sales - costs
+  ) 
+
+## product report -- revenue as metric
+
+prod_report <-
+  df %>% 
+  mutate(
+    Product_Price = str_remove(Product_Price, "\\$") %>% as.numeric(),
+    Product_Cost =  str_remove(Product_Cost, "\\$") %>% as.numeric(),
+  ) %>% 
+  group_by(
+    Date,
+    Product_Category,
+    Product_Name,
+  ) %>% 
+  summarise(
+    costs = sum(Product_Cost),
+    sales = sum(Product_Price),
+    items_sold = n(),
+    total_revenue = sales - costs
+  ) 
+
+# show reports
+
+rev_report %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+geo_report %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+prod_report  %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
+
+## general viz
+
+# by category
+
+df %>% 
+  ggplot(aes(x=Date, colour=Product_Category)) +
+  geom_bar() +
+  facet_wrap(~ Product_Category) +
+  theme_ipsum() +
+  theme(legend.title = element_blank(),
+        legend.position = 'none',
+  axis.text.x = element_text(
+    angle = 45,
+    vjust = 0.5,
+    hjust = 1,
+    size = 9
+    )
+  )
+
+# drill into Art and Crafts
+
+df %>% 
+  filter(Product_Category == 'Art & Crafts') %>% 
+  ggplot(aes(x=Date, y=Units, colour=Product_Name, group=Product_Name, fill=Product_Name)) +
+  geom_area() +
+  facet_wrap(~ Product_Name) +
+  theme_ipsum() +
+  theme(legend.title = element_blank(),
+        legend.position = 'none',
+        axis.text.x = element_text(
+          angle = 45,
+          vjust = 0.5,
+          hjust = 1,
+          size = 9
+        )
+  )
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+
+# viz reports
+
+rev_report %>% 
+  ggplot(aes(Date, total_revenue, group=Product_Category,col=Product_Category)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=wes_palettes$FantasticFox1) +
   theme(legend.title = element_blank(),
         legend.position = 'bottom')
+
+rev_report %>% 
+  ggplot(aes(Date, total_revenue/items_sold, group=Product_Category,col=Product_Category)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=wes_palettes$FantasticFox1) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom') +
+  ylab("average rev per product")
+
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+geo_report %>% 
+  ggplot(aes(Date, total_revenue, group=Store_City,col=Store_City)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=colorRampPalette(wes_palettes$FantasticFox1)(29)) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom')
+
+geo_report %>% 
+  ggplot(aes(Date, total_revenue/items_sold, group=Store_City,col=Store_City)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=colorRampPalette(wes_palettes$FantasticFox1)(29)) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom') +
+  ylab("average rev per product")
+
+```
+  
+  
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+
+geo_report %>% 
+  ggplot(aes(Date, total_revenue, group=Store_Location,col=Store_Location)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=wes_palettes$FantasticFox1) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom')
+
+geo_report %>% 
+  ggplot(aes(Date, total_revenue/items_sold, group=Store_Location,col=Store_Location)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=wes_palettes$FantasticFox1) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom') +
+  ylab("average rev per product")
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
+# regional revenue 
+#Valle-Jones D (2022). mxmaps: Create Maps of Mexico. https://www.diegovalle.net/mxmaps/, https://github.com/diegovalle/mxmaps.
+
+revenue_choropleth <- tibble(
+  region =
+    geo_report %>% 
+    left_join(read_csv('state.csv'),
+            by=c('Store_City'='state')) %>% ungroup %>% 
+  select(code) %>% 
+    unlist
+) %>% 
+  mutate(value = geo_report$total_revenue) %>% 
+  group_by(region) %>% 
+  summarise(
+    value = sum(value)
+  )
+
+mxstate_choropleth(
+  revenue_choropleth,
+  num_colors = 5,
+  title = "",
+  legend = "revenue"
+  )
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+
+prod_report %>% 
+  filter(Product_Category == 'Art & Crafts') %>% 
+  ggplot(aes(Date, total_revenue, group=Product_Name,col=Product_Name)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=colorRampPalette(wes_palettes$FantasticFox1)(8)) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom')
+
+prod_report %>% 
+  filter(Product_Category == 'Art & Crafts') %>% 
+  ggplot(aes(Date, total_revenue/items_sold, group=Product_Name,col=Product_Name)) +
+  geom_smooth(method = 'loess', se = F) +
+  theme_ipsum() +
+  scale_colour_manual(name = '', values=colorRampPalette(wes_palettes$FantasticFox1)(8)) +
+  theme(legend.title = element_blank(),
+        legend.position = 'bottom') +
+  ylab("average rev per product")
 
 ```

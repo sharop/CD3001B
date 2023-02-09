@@ -1,0 +1,6 @@
+Field,Description
+Store_ID,Store ID
+Store_Name,Store name
+Store_City,City in Mexico where the store is located
+Store_Location,Location in the city where the store is located
+Store_Open_Date,Date when the store was opened

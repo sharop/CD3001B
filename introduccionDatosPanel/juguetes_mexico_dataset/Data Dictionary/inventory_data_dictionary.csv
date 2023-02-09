@@ -1,0 +1,4 @@
+Field,Description
+Store_ID,Store ID
+Product_ID,Product ID
+Stock_On_Hand,Stock quantity of the product in the store (inventory)

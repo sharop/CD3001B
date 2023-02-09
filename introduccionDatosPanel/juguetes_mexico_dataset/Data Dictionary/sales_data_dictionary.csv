@@ -1,0 +1,6 @@
+Field,Description
+Sale_ID,Sale ID
+Date,Date of the transaction
+Store_ID,Store ID
+Product_ID,Product ID
+Units,Units sold

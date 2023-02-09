@@ -1,0 +1,6 @@
+Field,Description
+Product_ID,Product ID
+Product_Name,Product name
+Product_Category,Product Category
+Product_Cost,Product cost ($USD)
+Product_Price,Product retail price ($USD)
