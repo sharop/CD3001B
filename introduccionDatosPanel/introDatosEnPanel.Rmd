@@ -17,6 +17,11 @@ library(hrbrthemes)
 library(tsibbledata)
 library(wesanderson)
 library(mxmaps)
+library(xgboost)
+library(scales)
+library(rsample)
+source('xgb_functions.R')
+
 thematic::thematic_rmd()
 
 ```
@@ -25,13 +30,13 @@ thematic::thematic_rmd()
 
 <center>
 
-### Análisis de Datos en Panel
+### Algunos Ejemplos de Análisis de Datos en Panel
 
 </center>
 
 ## {.tabset}
 
-### Algunos Recursos
+### Recursos
 
 * OpenIntro Statistics: https://stat.duke.edu/books/openintro-statistics
   
@@ -520,5 +525,232 @@ prod_report %>%
   theme(legend.title = element_blank(),
         legend.position = 'bottom') +
   ylab("average rev per product")
+
+```
+
+### Modelo
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+
+mdata <- 
+df %>% 
+  select(
+    Date,
+    Product_Name, 
+    Product_Category, 
+    Product_Cost, 
+    Product_Price, 
+    Store_City, 
+    Store_Location,
+    Units)
+
+# understand data
+
+mdata %>% glimpse()
+
+mdata %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+```
+
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
+
+# visualise data
+
+mdata %>% 
+  group_by(
+    Date
+  ) %>% 
+  summarise(
+    sales = sum(Units)
+  ) %>% 
+  ggplot(aes(Date, sales)) +
+  geom_line(alpha=0.5, colour = '#1C2D44') +
+  geom_smooth(method='loess',se=F, alpha=0.7, colour='#00B2A8', linetype = 3) +
+  theme_ipsum()
+
+```
+
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
+
+############################################# data wrangling
+############################################################
+
+
+# rework data for modelling to predict toys unit sales
+# aggregate by day counting the number of products which
+# meet x criterion
+
+mdata <- 
+  mdata %>% 
+  # pivot wider categorical variables (values become variables) 
+  # count cases of toys which meet the criterion
+  group_by(Date) %>% 
+  pivot_wider(id_cols = Date,
+              names_from = c(Product_Name,
+                             Product_Category,
+                             Store_City,
+                             Store_Location), 
+              values_from =  c(Product_Name,
+                               Product_Category,
+                               Store_City,
+                               Store_Location),
+              values_fn = length,
+              values_fill = 0
+  ) %>% 
+ # aggregate numeric vairables at a daily level
+  left_join(
+    mdata %>% 
+      mutate(
+        Product_Cost = str_remove(Product_Cost,'\\$') %>% as.numeric,
+        Product_Price = str_remove(Product_Price,'\\$') %>% as.numeric
+      ) %>% 
+      group_by(Date) %>% 
+      summarise(
+        Product_Cost = sum(Product_Cost),
+        Product_Price = sum(Product_Price),
+        Units = sum(Units)
+      ), 
+    by='Date')  %>% 
+  ungroup %>% 
+  mutate(Units = dplyr::lead(Units, n=1)) %>% 
+  drop_na %>% 
+  select(-Date)
+
+# rescale variables (minmax) 0-1
+Units <- mdata$Units
+mdata <-
+  mdata %>% 
+  select(-Units) %>% 
+  map_dfc(.,
+          ~ rescale(., to=c(0,1))
+  ) %>% 
+  mutate(Units = Units)
+
+mdata %>% 
+  head %>%
+  kable(.,
+        format = "html",
+        booktabs = TRUE) %>%
+  kable_styling(font_size = 12) %>%
+  scroll_box(width = "100%")
+
+
+```
+
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
+
+################################################### fit model
+############################################################
+
+# 4-fold sliding-window validation (rather than cross-validation)
+# split the data in 4 sections of 327 rows for training and 51 for testing
+# store them in the list "folds"
+
+folds=list()
+
+slider = 0
+
+for (fold in 1:4) {
+  
+  folds[[fold]] = list(train = mdata[(1+slider):(327+slider),],
+                       test = mdata[(327+slider):(377+slider),])
+  slider = slider + 50
+  
+}
+
+
+# prepare data for final model with training, test 75/25 split
+final_model_data <- splitTrainTest(mdata)
+
+
+# prepare xgboost matrices 
+# sliding-windows
+yvar = 'Units'
+xvars = (mdata %>% names)[(df %>% names) != 'Units']
+xgb_folds = list()
+for (fold in 1:length(folds)){
+  xgb_folds[[fold]] <- list()
+  for (sample in c('train', 'test')){
+    xgb_folds[[fold]][[sample]] <- 
+      makeXGBMatrix(
+      xvars=xvars,
+      yvar=yvar,
+      folds[[fold]][[sample]]
+      )
+  }
+}
+```
+
+```{r eval=TRUE, message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%", results='hide'}
+
+# final model
+final_model_xgb <- lapply(final_model_data, function(x) makeXGBMatrix(x, xvars=xvars,yvar=yvar))
+finalXGB <- searchXGB(xgb_folds,final_model_xgb)
+
+xgb.save(finalXGB$finalXGB, 'xgb_model')
+
+```
+
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
+
+#finalXGB <- xgb.load('xgb_model')
+
+# visualise error during training
+
+finalXGB$finalXGB$evaluation_log %>% 
+  as_tibble() %>% 
+  pivot_longer(
+    cols = c('train_rmse',
+             'test_rmse'),
+    names_to = 'sample',
+    values_to = 'error'
+    ) %>% 
+  ggplot(aes(iter, error, group=sample, col=sample)) +
+  geom_line() +
+  theme_ipsum() +
+  scale_color_manual(values=c('#1C2D44','#00B2A8'))
+
+```
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+
+# y vs. y hat viz
+
+tibble(
+  date = unique(df$Date)[1:(length(unique(df$Date))-1)],
+  y = mdata$Units,
+  yhat =c(predict(finalXGB$finalXGB,final_model_xgb$train),predict(finalXGB$finalXGB,final_model_xgb$test))
+) %>% 
+  pivot_longer(cols = c('y','yhat'),
+               names_to = 'variable',
+               values_to = 'value') %>% 
+  ggplot(aes(date,value, group=variable,col=variable)) +
+  geom_line(alpha=0.75) +
+  theme_ipsum() +
+  scale_color_manual(values=c('#1C2D44','#00B2A8'))
+
+tibble(
+  date = unique(df$Date)[1:(length(unique(df$Date))-1)],
+  y = mdata$Units,
+  yhat =c(predict(finalXGB$finalXGB,final_model_xgb$train),predict(finalXGB$finalXGB,final_model_xgb$test))
+) %>% 
+  pivot_longer(cols = c('y','yhat'),
+               names_to = 'variable',
+               values_to = 'value') %>% 
+  ggplot(aes(date,value, group=variable,col=variable)) +
+  geom_smooth(method='loess',se=F,alpha=0.75) +
+  theme_ipsum() +
+  scale_color_manual(values=c('#1C2D44','#00B2A8')) +
+  ylab("smoothened value")
 
 ```
