@@ -1,0 +1,180 @@
+---
+title: "Modelos de pronósticos en series de tiempo"
+output: 
+  html_document:
+    css: bootstrap.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(tsibble)
+library(lubridate)
+library(hrbrthemes)
+library(tsibbledata)
+
+thematic::thematic_rmd()
+
+```
+
+## {.tabset}
+
+### Recursos
+
+* OpenIntro Statistics: https://stat.duke.edu/books/openintro-statistics
+  
+* Rob J Hyndman (In Hyndsight) https://robjhyndman.com/
+  
+* Series de Tiempo y Modelos de Pronóstico: https://michaela-kratofil.com/files/2009_Book_IntroductoryTimeSeriesWithR.pdf
+  
+* Algunas funciones en R para series de tiemp: https://nicholasrjenkins.science/post/tidy_time_series/tts_r/
+  
+* Bases de datos: https://stat2labs.sites.grinnell.edu/DataResources.html
+  
+* Visualización de datos en R: https://r-graph-gallery.com/
+
+### Introducción a los modelos de pronósticos en series de tiempo
+
+<h3> Intro </h3> 
+
+Cowpertwait, P., Metclafe, A. Introductory Time Series With R. Springer.
+
+* In most branches of science, engineering, and commerce, there are variables
+measured sequentially in time.
+  
+* Observations that have been collected over fixed sampling intervals form a
+historical time series.
+  
+* In statistics, historical series are treated as realisations of sequences of random variables.
+
+* The main features of many time series are trends and seasonal variations that can be modelled deterministically with mathematical functions of time. But, another important feature of most time series is that observations close together in time tend to be correlated (serially dependent). 
+
+* Much of the methodology in a time series analysis is aimed at explaining this correlation and the main features in the data using appropriate statistical models and descriptive methods.
+
+* Once a good model is found and fitted to data, the analyst can use the model to forecast future values, or generate simulations, to
+guide planning decisions.
+
+<h3> Sampling </h3> 
+  
+* Sampling intervals differ in their relation to the data.
+  
+*  If data are sampled, the sampling interval must be short enough for the time series
+to provide a very close approximation to the original continuous signal when it is interpolated.
+  
+<h3> Características de la Serie de Tiempo </h3>
+
+```{r message=FALSE, error=FALSE, fig.show='hold', out.width='50%'}
+
+data(AirPassengers)
+AP <- AirPassengers
+
+plot(AP, ylab = "Passengers (1000's)")
+ 
+
+AP %>% 
+  as_tsibble() %>% 
+  ggplot(aes(index, value)) +
+    geom_line(color='#00B2A8') +
+    theme_ipsum()
+
+``` 
+* In general, a systematic change in a time series that does not appear to be
+periodic is known as a trend. The simplest model for a trend is a linear increase
+or decrease, and this is often an adequate approximation.
+  
+* A repeating pattern within each year is known as seasonal variation, although the term is applied more generally to repeating patterns within any fixed period, such as restaurant bookings on different days of the week.
+  
+* Sometimes we may claim there are cycles in a time series that do not correspond to some fixed natural period; examples may include business cycles or
+climatic oscillations such as El Ni˜no
+
+* A time series plot not only emphasises patterns and features of the data but can also expose outliers and erroneous values. One cause of the latter is that missing data are sometimes coded using a negative value. Such values need to be handled differently in the analysis and must not be included as observations when fitting a model to data.
+  
+```{r message=FALSE, error=FALSE, fig.show='hold', out.width='50%'}
+
+AP %>% 
+  as_tsibble() %>% 
+  index_by(year = ~ year(.)) %>% 
+  summarise(passengers = sum(value)) %>% 
+  ggplot(aes(year, passengers)) +
+  geom_line(color='#00B2A8') +
+  theme_ipsum()
+
+
+AP %>% 
+  as_tsibble() %>% 
+  ggplot(aes(index, value)) +
+    geom_line(color='#00B2A8') +
+    geom_smooth(alpha=0.7, colour = '#1C2D44', se=F, method='loess', linetype=3) +
+    theme_ipsum()
+  
+
+```
+
+```{r message=FALSE, error=FALSE, fig.show='hold', out.width='50%'}
+
+AP_month <-
+  AP %>% 
+  as_tsibble() %>% 
+  index_by(month = ~ lubridate::month(., label=F)) %>% 
+  summarise(passengers = sum(value)) %>% 
+  mutate(m = lubridate::month(month, label=T)) %>% 
+  ungroup()
+
+AP_month %>% 
+  ggplot(aes(x=month, y=passengers)) +
+  geom_line(color='#00B2A8') +
+  theme_ipsum() +
+  scale_x_discrete(limits = unique(AP_month$m), labels=unique(AP_month$m))
+  
+AP %>% 
+  as_tsibble() %>% 
+ # index_by(month = ~ lubridate::month(., label=T)) %>% 
+#  summarise(passengers = sum(value)) %>% 
+  mutate(month=month(index, label=T)) %>% 
+  ggplot(aes(month, value, group=month, color=month, fill=month)) +
+  geom_boxplot(stat = "boxplot",position = "dodge2") +
+  theme_ipsum() +
+  theme(
+    legend.position = 'none'
+  )
+  
+
+```
+  
+<h3> Decomposition of series and notation </h3>
+
+* We represent a time series of length n by {$x_{t} : t = 1, . . . , n$} = {$x_{1}, x_{2}, . . . , x_{n}$}.
+
+* It consists of n values sampled at discrete times 1, 2, . . . , n.
+
+* {xt} when the length n of the series does not need to be specified.
+
+* An overline is used for sample means: $$\overline{x}  = \sum x_{i}/n$$
+
+* The ‘hat’ notation will be used to represent a prediction or forecast. For example, with the series ${x_{t} : t = 1, . . . , n}$, $\hat{x}_{t+k|t}$ is a forecast made at time t for a future value at time t + k. A forecast is a predicted future value, and the number of time steps into the future is the lead time (k).
+
+### Modelos de pronósticos en series de tiempo
+
+<h3> Additive decomposition model </h3>
+
+* A simple additive decomposition model is given by: $$x_{t} = m_{t} + s_{t} + z_{t}$$ where, at time t, $x_{t}$ is the observed series, $m_{t}$ is the trend, $s_{t}$ is the seasonal effect, and $z_{t}$ is an error term that is, in general, a sequence of correlated random variables with mean zero.
+
+* If the seasonal effect tends to increase as the trend increases, a multiplicative model may be more appropriate: $$x_{t} = m_{t} * s_{t} +z_{t}$$
+
+* If the random variation is modelled by a multiplicative factor and the variable is positive, an additive decomposition model for $log(x_{t})$ [log means natural logarithm, sometimes written ln] can be used: $$log(x_{t}) = m_{t} + s_{t} + z_{t}$$
+
+* Some care is required when the exponential function is applied to the predicted mean of log(xt) to obtain a prediction for the mean value xt, as the effect is usually to bias the predictions. If the random series zt are normally distributed with mean 0 and variance $/sigma^{2}$, then the predicted mean value at time t based on the above equation is given by: $$\hat{x}_{t} = e^{m_{e}+s_{t}e^{\frac{1}{2}\sigma^{2}}}$$ However, if the error series is not normally distributed and is negatively skewed (i.e. its probability has a long tail to the left) as is often the case after taking logarithms, the bias correction factor will be an overcorrection and it is preferable to apply an empirical adjustment.
+  
+<h3>  Estimating trends and seasonal effects </h3>
+  
+* There are various ways to estimate the trend $m_{t}$ at time $t$, but a relatively simple procedure, which is available in R and does not assume any specific form is to calculate a moving average centred on $x_{t}$.
+
+* For monthly series, we need to average twelve consecutive months, but there is a slight snag. Suppose our time series begins at January (t = 1) and we average January up to December (t = 12). This average corresponds to a time t = 6.5, between June and July. When we come to estimate seasonal effects, we need a moving average at integer times. This can be achieved by averaging the average of January up to December and the average of February (t = 2) up to January (t = 13). This average of two moving averages corresponds to t = 7, and the process is called centring. Thus the trend at time t can be estimated by the centred moving average $$\hat{m_{t}} = \frac{\frac{1}{2}x_{t-6} + x_{t-5} + ... + x_{t-1} + x_{t} + x_{t+1} + ... x_{t+5} + \frac{1}{2}x_{t+6}}{12}$$ where t = 7, . . . , n − 6. The coefficients in above equation for each month are 1/12 (or sum to 1/12 in the case of the first and last coefficients), so that equal weight is given to each month and the coefficients sum to 1. By using the seasonal frequency for the coefficients in the moving average, the procedure generalises for any seasonal frequency (e.g., quarterly series), provided the condition that the coefficients sum to unity is still met.
+
+
+### Modelos estacionarios y no estacionarios 
+
+
+### Modelos ARIMA, ARMA, SARIMA.
