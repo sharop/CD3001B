@@ -9,13 +9,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
-library(tidyverse)
 library(kableExtra)
 library(tsibble)
 library(lubridate)
 library(hrbrthemes)
 library(tsibbledata)
-library(wesanderson)
 library(mxmaps)
 library(xgboost)
 library(scales)
@@ -223,7 +221,6 @@ AP %>%
 
 ### Ejemplo
 
-
 ```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
 
 # read datasets
@@ -275,6 +272,7 @@ df_stores %>%
   scroll_box(width = "100%")
 ```
   
+
 ```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
 # join relevant tables
 
@@ -374,6 +372,8 @@ prod_report  %>%
   scroll_box(width = "100%")
 
 ```
+
+<h3> Some visualisations </h3>
 
 ```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="105%"}
 
@@ -655,6 +655,10 @@ mdata %>%
 # split the data in 4 sections of 327 rows for training and 51 for testing
 # store them in the list "folds"
 
+mdata <-
+  mdata %>% 
+  rename_with(., ~ tolower(gsub(" ","_",gsub(".", "_", .x, fixed = TRUE))))
+
 folds=list()
 
 slider = 0
@@ -674,8 +678,8 @@ final_model_data <- splitTrainTest(mdata)
 
 # prepare xgboost matrices 
 # sliding-windows
-yvar = 'Units'
-xvars = (mdata %>% names)[(df %>% names) != 'Units']
+yvar = 'units'
+xvars = (mdata %>% names)[(mdata %>% names) != 'units']
 xgb_folds = list()
 for (fold in 1:length(folds)){
   xgb_folds[[fold]] <- list()
@@ -692,11 +696,13 @@ for (fold in 1:length(folds)){
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%", results='hide'}
 
+# https://xgboost.readthedocs.io/en/stable/
+
 # final model
 final_model_xgb <- lapply(final_model_data, function(x) makeXGBMatrix(x, xvars=xvars,yvar=yvar))
 finalXGB <- searchXGB(xgb_folds,final_model_xgb)
 
-xgb.save(finalXGB$finalXGB, 'xgb_model')
+#xgb.save(finalXGB$finalXGB, 'xgb_model')
 
 ```
 
@@ -722,35 +728,33 @@ finalXGB$finalXGB$evaluation_log %>%
 
 ```
 
-```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="50%"}
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
 
 # y vs. y hat viz
 
 tibble(
   date = unique(df$Date)[1:(length(unique(df$Date))-1)],
-  y = mdata$Units,
+  y = mdata$units,
   yhat =c(predict(finalXGB$finalXGB,final_model_xgb$train),predict(finalXGB$finalXGB,final_model_xgb$test))
-) %>% 
+)  %>% 
   pivot_longer(cols = c('y','yhat'),
                names_to = 'variable',
                values_to = 'value') %>% 
-  ggplot(aes(date,value, group=variable,col=variable)) +
-  geom_line(alpha=0.75) +
+  ggplot(aes(date,value)) +
+  geom_line(alpha=0.7, colour = '#1C2D44') +
+  geom_smooth(method='loess',se=F, alpha=0.7, colour='#00B2A8', linetype = 3) +
   theme_ipsum() +
-  scale_color_manual(values=c('#1C2D44','#00B2A8'))
+  facet_wrap(~variable)  
 
-tibble(
-  date = unique(df$Date)[1:(length(unique(df$Date))-1)],
-  y = mdata$Units,
-  yhat =c(predict(finalXGB$finalXGB,final_model_xgb$train),predict(finalXGB$finalXGB,final_model_xgb$test))
-) %>% 
-  pivot_longer(cols = c('y','yhat'),
-               names_to = 'variable',
-               values_to = 'value') %>% 
-  ggplot(aes(date,value, group=variable,col=variable)) +
-  geom_smooth(method='loess',se=F,alpha=0.75) +
-  theme_ipsum() +
-  scale_color_manual(values=c('#1C2D44','#00B2A8')) +
-  ylab("smoothened value")
+```
 
+
+```{r message=FALSE, warning=FALSE,error=FALSE, fig.show='hold',out.width="100%"}
+
+make_shap_viz(final_model_data$train, 
+              finalXGB$finalXGB, 
+              yvar='units', 
+              shap_viz_name=''
+              )
+  
 ```

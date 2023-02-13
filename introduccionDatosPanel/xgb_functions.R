@@ -14,12 +14,11 @@ searchXGB <- function(xgb_folds,final_model_xgb){
   for(i in 1:20){
     
     params = list(
-      tree_method = 'exact',
       booster = 'gbtree',
       eta = runif(1, 0.1, 0.3),
-      max_depth = sample(6:10, 1),
-      lambda = runif(1, 0.01, 0.5),
-      alpha = runif(1, 0.001, 0.5),  
+      max_depth = sample(6:8, 1),
+      lambda = runif(1, 0.01, 0.4),
+      alpha = runif(1, 0.01, 0.4),  
       gamma = runif(1, 0, 20),
       subsample = runif(1, .5, 1),
       colsample_bytree = runif(1, .5, 1),
@@ -106,4 +105,34 @@ makeXGBMatrix <- function(xvars, yvar, dataz){
   
   return(XGBmatrix)
   
+}
+
+make_shap_viz <- function(dataz, finalXGB, yvar, shap_viz_name, ...){
+  
+  dataMatrix <-
+    dataz %>% 
+    select(-(yvar)) %>% 
+    as.matrix
+  
+  xgb.ggplot.shap.summary(
+    model = finalXGB,
+    top_n = 20,
+    data = dataMatrix) +
+    theme_ipsum() +
+    labs(y = yvar,
+         x = 'Características de la Venta') +
+    #ggtitle(shap_viz_name) +
+    theme(
+      text = element_text(colour="lightgray"),
+      axis.text.x = element_text(
+        colour="lightgray"),
+      axis.text.y = element_text(
+        colour="lightgray"),
+      legend.title=element_text(
+        colour="lightgray")
+      
+    ) +
+    labs(colour = "") +
+    scale_x_discrete(label=abbreviate)
+    
 }
