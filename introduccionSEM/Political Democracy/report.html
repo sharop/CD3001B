@@ -1,0 +1,1783 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Georgy Meshcheryakov">
+    <title>Political Democracy: Report</title>
+
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/semopy.css" rel="stylesheet">
+    <script src="./js/bootstrap.min.js"></script>
+    <style>nav .nav-link {
+    color: black;
+}
+nav .nav-link:hover {
+    color: grey;
+}
+nav .nav-link.active {
+    color: grey;
+}</style>
+
+
+  </head>
+  <body>
+<br><br>
+<div class="container-fluid">
+	<div class="row">
+	<div class="col-sm-8">
+	<h2 style="display:inline">Report: Political Democracy</h2>
+	</div>
+</div>
+<div class="container-fluid" >
+  <div class="row">
+    <div class="col-sm-2">
+     <br>
+     <div class="sticky-top">
+      <nav class="nav flex-column" >
+        <a class="p-1 nav-link active" id="model_m" href="#model">Model information</a>
+        <a class="p-1 nav-link" id="estimates_m" href="#estimates">Estimates</a>
+        <a class="p-1 nav-link" id="indices_m" href="#indices">Fit indices</a>
+	<a class="p-1 nav-link" id="matrices_m" href="#matrices">Matrices</a>
+      </nav>
+     </div>
+    </div>
+    <div class="col-sm-9" style="border-left: 1px solid">
+     <br>
+	<a class="anchor" id="model"></a>
+	<h3>Model information</h3>
+		<div class="row">
+		<div class="col-sm-4">Model class:</div><div class="col-sm-2"><span style="background-color: #f6f8fa; font-family: monospace;">ModelMeans</span></div>
+		</div>
+		<div class="row">
+		<div class="col-sm-4">Number of samples:</div><div class="col-sm-2">75</div>
+		</div>
+		<div class="row">
+		<div class="col-sm-4">Objective function:</div><div class="col-sm-2">FIML</div>
+		</div>
+		<div class="row">
+		<div class="col-sm-4">Converged:</div><div class="col-sm-2 text-success">Yes</div>
+		</div>
+		<br>
+		Description in <b>semopy</b> syntax:
+		<div class="col-sm-9" style="background-color: #f6f8fa;max-width: 100%;width: 100%;border: 1px solid">
+		<pre style="font-family: monospace"># measurement model
+ind60 =~ x1 + x2 + x3
+dem60 =~ y1 + y2 + y3 + y4
+dem65 =~ y5 + y6 + y7 + y8
+# regressions
+dem60 ~ ind60
+dem65 ~ ind60 + dem60
+# residual correlations
+y1 ~~ y5
+y2 ~~ y4 + y6
+y3 ~~ y7
+y4 ~~ y8
+y6 ~~ y8</pre>
+		</div>
+		<br>
+		<div class="accordion" id="accordion1">
+		<div class="accordion-item">
+	    <h2 class="accordion-header" id="headingOne">
+	      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+		Variables classification
+	      </button>
+	    </h2>
+	    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordion1">
+	      <div class="accordion-body">
+		<div class="row"><div class="col-sm-2">all</div><div class="col-sm-6">dem60, y4, x1, y5, y6, x3, ind60, dem65, x2, y8, y2, y3, y1, y7</div></div><div class="row"><div class="col-sm-2">endogenous</div><div class="col-sm-6">y7, dem65, x2, y8, dem60, y2, y1, y3, y4, x1, y5, y6, x3</div></div><div class="row"><div class="col-sm-2">exogenous</div><div class="col-sm-6">ind60</div></div><div class="row"><div class="col-sm-2">observed</div><div class="col-sm-6">x1, x2, x3, y1, y2, y3, y4, y5, y6, y7, y8</div></div><div class="row"><div class="col-sm-2">latent</div><div class="col-sm-6">dem60, dem65, ind60</div></div><div class="row"><div class="col-sm-2">indicator</div><div class="col-sm-6">y7, x2, y8, y2, y3, y6, y4, x1, y5, y1, x3</div></div><div class="row"><div class="col-sm-2">output</div><div class="col-sm-6"></div></div><div class="row"><div class="col-sm-2">observed_exogenous</div><div class="col-sm-6">1</div></div><div class="row"><div class="col-sm-2">_output</div><div class="col-sm-6">x2, x3, y8, y2, y1, y3, y4, x1, y5, y6, y7</div></div><div class="row"><div class="col-sm-2">inner</div><div class="col-sm-6">dem60, dem65, ind60</div></div><div class="row"><div class="col-sm-2">observed_exogenous_1</div><div class="col-sm-6"></div></div><div class="row"><div class="col-sm-2">observed_exogenous_2</div><div class="col-sm-6">1</div></div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<br>
+		<ul class="nav nav-tabs" id="myTab" role="tablist">
+		  <li class="nav-item" role="presentation">
+		    <button class="nav-link active" id="plainfig-tab" data-bs-toggle="tab" data-bs-target="#plainfig" type="button" role="tab" aria-controls="plainfig" aria-selected="true">Omit covariances and estimates</button>
+		  </li>
+		  <li class="nav-item" role="presentation">
+		    <button class="nav-link" id="covfig-tab" data-bs-toggle="tab" data-bs-target="#covfig" type="button" role="tab" aria-controls="covfig" aria-selected="false">Omit covariances</button>
+		  </li>
+		  <li class="nav-item" role="presentation">
+		    <button class="nav-link" id="plainparamfig-tab" data-bs-toggle="tab" data-bs-target="#plainparamfig" type="button" role="tab" aria-controls="plainparamfig" aria-selected="false">Omit estimates</button>
+		  </li>
+		<li class="nav-item" role="presentation">
+		    <button class="nav-link" id="covparamfig-tab" data-bs-toggle="tab" data-bs-target="#covparamfig" type="button" role="tab" aria-controls="covparamfig" aria-selected="false">Show estimates and covariances</button>
+		  </li>
+		</ul>
+		<div class="tab-content" id="myTabContent">
+		  <div class="tab-pane fade show active" id="plainfig" role="tabpanel" aria-labelledby="plainfig-tab"><img src="./plots/1.png" class="img-fluid" alt="Model figure with covariances and estimates omitted"></div>
+		  <div class="tab-pane fade" id="covfig" role="tabpanel" aria-labelledby="covfig-tab"><img src="./plots/2.png" class="img-fluid" alt="Model figure with covariances omitted"></div>
+		  <div class="tab-pane fade" id="plainparamfig" role="tabpanel" aria-labelledby="plainparamfig-tab"><img src="./plots/3.png" class="img-fluid" alt="Model figure with estimates omitted"></div>
+		 <div class="tab-pane fade" id="covparamfig" role="tabpanel" aria-labelledby="covparamfig-tab"><img src="./plots/4.png" class="img-fluid" alt="Model figure"></div>
+		</div>
+		
+	<a class="anchor" id="estimates"></a>
+	<h3>Estimates</h3>
+	<div style="font-family:monospace">
+	<div class="row"><div class='col-sm-2'></div><div class='col-sm-2'></div><div class='col-sm-1'>Estimate</div><div class='col-sm-1'>P-value</div></div><div class='col-sm-2'>Measurement:</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div><div class="row"><div class='col-sm-2 text-end'>ind60 =~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x1</div><div class='col-sm-1'>1.000</div><div class='col-sm-1'>-</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x2</div><div class='col-sm-1'>2.180</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x3</div><div class='col-sm-1'>1.819</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'>dem60 =~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y1</div><div class='col-sm-1'>1.000</div><div class='col-sm-1'>-</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y2</div><div class='col-sm-1'>1.257</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y3</div><div class='col-sm-1'>1.058</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y4</div><div class='col-sm-1'>1.265</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'>dem65 =~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y5</div><div class='col-sm-1'>1.000</div><div class='col-sm-1'>-</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y6</div><div class='col-sm-1'>1.186</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y7</div><div class='col-sm-1'>1.280</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y8</div><div class='col-sm-1'>1.266</div><div class='col-sm-1'>0.000</div></div><div class='col-sm-2'>Regressions:</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div><div class="row"><div class='col-sm-2 text-end'>dem60 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>ind60</div><div class='col-sm-1'>1.483</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'>dem65 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>ind60</div><div class='col-sm-1'>0.572</div><div class='col-sm-1'>0.010</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>dem60</div><div class='col-sm-1'>0.837</div><div class='col-sm-1'>0.000</div></div><div class='col-sm-2'>Intercepts:</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x1</div><div class='col-sm-1'>5.054</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x2</div><div class='col-sm-1'>4.792</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x3</div><div class='col-sm-1'>3.558</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y1</div><div class='col-sm-1'>5.465</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y2</div><div class='col-sm-1'>4.256</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y3</div><div class='col-sm-1'>6.563</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y4</div><div class='col-sm-1'>4.453</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y5</div><div class='col-sm-1'>5.136</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y6</div><div class='col-sm-1'>2.978</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y7</div><div class='col-sm-1'>6.196</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y8</div><div class='col-sm-1'>4.043</div><div class='col-sm-1'>0.000</div></div><div class='col-sm-2'>Variances:</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>dem65</div><div class='col-sm-1'>0.172</div><div class='col-sm-1'>0.422</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>dem60</div><div class='col-sm-1'>3.956</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>ind60</div><div class='col-sm-1'>0.448</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y1</div><div class='col-sm-1'>1.891</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y2</div><div class='col-sm-1'>7.373</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y3</div><div class='col-sm-1'>5.067</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y4</div><div class='col-sm-1'>3.148</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y6</div><div class='col-sm-1'>4.954</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y7</div><div class='col-sm-1'>3.431</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x2</div><div class='col-sm-1'>0.120</div><div class='col-sm-1'>0.086</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y8</div><div class='col-sm-1'>3.254</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x1</div><div class='col-sm-1'>0.082</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y5</div><div class='col-sm-1'>2.351</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>x3</div><div class='col-sm-1'>0.467</div><div class='col-sm-1'>0.000</div></div><div class="row"><div class='col-sm-2'>Covariances:</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'>y1 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y5</div><div class='col-sm-1'>0.624</div><div class='col-sm-1'>0.082</div></div><div class="row"><div class='col-sm-2 text-end'>y2 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y4</div><div class='col-sm-1'>1.313</div><div class='col-sm-1'>0.061</div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y6</div><div class='col-sm-1'>2.153</div><div class='col-sm-1'>0.003</div></div><div class="row"><div class='col-sm-2 text-end'>y3 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y7</div><div class='col-sm-1'>0.795</div><div class='col-sm-1'>0.191</div></div><div class="row"><div class='col-sm-2 text-end'>y4 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y8</div><div class='col-sm-1'>0.348</div><div class='col-sm-1'>0.431</div></div><div class="row"><div class='col-sm-2 text-end'>y6 ~</div><div class='col-sm-2'></div><div class='col-sm-1'></div><div class='col-sm-1'></div></div><div class="row"><div class='col-sm-2 text-end'></div><div class='col-sm-2'>y8</div><div class='col-sm-1'>1.356</div><div class='col-sm-1'>0.017</div></div>
+	</div>
+	<br>
+	<div class="accordion" id="accordion3">
+	<div class="accordion-item">
+	    <h2 class="accordion-header" id="headingThree">
+	      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+		semopy tabular output
+	      </button>
+	    </h2>	
+	    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordion3">
+	      <div class="accordion-body" style="background-color: #f6f8fa;max-width: 100%;width: 100%">
+		<pre style="font-family: monospace">     lval  op   rval  Estimate  Std. Err    z-value   p-value
+0   dem60   ~  ind60  1.482999  0.399149   3.715401  0.000203
+1   dem65   ~  ind60  0.572322  0.221313   2.586027  0.009709
+2   dem65   ~  dem60  0.837346  0.098351   8.513859       0.0
+3      x1   ~  ind60  1.000000         -          -         -
+4      x2   ~  ind60  2.180375   0.13851  15.741609       0.0
+5      x3   ~  ind60  1.818522   0.15196  11.967144       0.0
+6      y1   ~  dem60  1.000000         -          -         -
+7      y2   ~  dem60  1.256753  0.182439   6.888611       0.0
+8      y3   ~  dem60  1.057746  0.151385   6.987136       0.0
+9      y4   ~  dem60  1.264790  0.145006   8.722314       0.0
+10     y5   ~  dem65  1.000000         -          -         -
+11     y6   ~  dem65  1.185687   0.16881   7.023806       0.0
+12     y7   ~  dem65  1.279531  0.159903   8.001935       0.0
+13     y8   ~  dem65  1.265935   0.15811    8.00667       0.0
+14     x1   ~      1  5.054393  0.084062  60.126661       0.0
+15     x2   ~      1  4.792218   0.17327  27.657545       0.0
+16     x3   ~      1  3.557715  0.161233  22.065738       0.0
+17     y1   ~      1  5.464665  0.301854   18.10368       0.0
+18     y2   ~      1  4.256439   0.44987   9.461478       0.0
+19     y3   ~      1  6.563146  0.375891  17.460248       0.0
+20     y4   ~      1  4.452537   0.38391  11.597855       0.0
+21     y5   ~      1  5.136254  0.300511  17.091727       0.0
+22     y6   ~      1  2.978057  0.385931   7.716551       0.0
+23     y7   ~      1  6.196289  0.377202  16.426972       0.0
+24     y8   ~      1  4.043383  0.371319  10.889254       0.0
+25  dem65  ~~  dem65  0.172487  0.214803   0.803001  0.421974
+26  dem60  ~~  dem60  3.956039  0.921185   4.294508  0.000018
+27  ind60  ~~  ind60  0.448436  0.086692   5.172765       0.0
+28     y1  ~~     y5  0.623671  0.358319   1.740548  0.081763
+29     y1  ~~     y1  1.891402  0.444423   4.255861  0.000021
+30     y2  ~~     y4  1.313085   0.70198   1.870545  0.061408
+31     y2  ~~     y6  2.152828  0.733771   2.933925  0.003347
+32     y2  ~~     y2  7.372791  1.373882   5.366395       0.0
+33     y3  ~~     y7  0.794961  0.607702   1.308143  0.190825
+34     y3  ~~     y3  5.067487  0.951738   5.324453       0.0
+35     y4  ~~     y8  0.348246  0.442238   0.787464   0.43101
+36     y4  ~~     y4  3.147907  0.738783   4.260936   0.00002
+37     y6  ~~     y8  1.356165  0.568281   2.386434  0.017013
+38     y6  ~~     y6  4.953952  0.914241   5.418647       0.0
+39     y7  ~~     y7  3.431334  0.712843   4.813589  0.000001
+40     x2  ~~     x2  0.119802  0.069721   1.718314  0.085739
+41     y8  ~~     y8  3.254068  0.694596   4.684837  0.000003
+42     x1  ~~     x1  0.081551   0.01949   4.184259  0.000029
+43     y5  ~~     y5  2.350969  0.480238   4.895427  0.000001
+44     x3  ~~     x3  0.466708  0.090157   5.176583       0.0</pre>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<br>
+	<div class="accordion" id="accordion2">
+	<div class="accordion-item">
+	    <h2 class="accordion-header" id="headingTwo">
+	      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+		Optimizer report
+	      </button>
+	    </h2>	
+	    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordion2">
+	      <div class="accordion-body" style="background-color: #f6f8fa;max-width: 100%;width: 100%">
+		<pre style="font-family: monospace">Name of objective: FIML
+Optimization method: SLSQP
+Optimization successful.
+Optimization terminated successfully
+Objective value: 1579.333
+Number of iterations: 68
+Params: 2.180 1.819 1.257 1.058 1.265 1.186 1.280 1.266 5.054 4.792 3.558 5.465 4.256 6.563 4.453 5.136 2.978 6.196 4.043 1.483 0.572 0.837 0.624 1.891 1.313 2.153 7.373 0.795 5.067 0.348 3.148 1.356 4.954 3.431 0.172 0.120 3.254 3.956 0.082 2.351 0.467 0.448</pre>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<a class="anchor" id="indices"></a>
+	<h3>Fit indices</h3>
+	<table class="table"><thead><tr><th scope='col'>DoF</th><th scope='col'>DoF Baseline</th><th scope='col'>chi2</th><th scope='col'>chi2 p-value</th><th scope='col'>chi2 Baseline</th></tr></thead><tbody><tr><td>24.000</td><td>44.000</td><td>21.058</td><td>0.635</td><td>30.291</td></tr></tbody></table><table class="table"><thead><tr><th scope='col'>CFI</th><th scope='col'>GFI</th><th scope='col'>AGFI</th><th scope='col'>NFI</th><th scope='col'>TLI</th></tr></thead><tbody><tr><td>0.785</td><td>0.305</td><td>-0.274</td><td>0.305</td><td>0.607</td></tr></tbody></table><table class="table"><thead><tr><th scope='col'>RMSEA</th><th scope='col'>AIC</th><th scope='col'>BIC</th><th scope='col'>LogLik</th></tr></thead><tbody><tr><td>0.000</td><td>82.983</td><td>180.318</td><td>0.508</td></tr></tbody></table>
+	<a class="anchor" id="matrices"></a>
+	<h3>Matrices</h3>
+ 	<center><h4>Covariance matrix</h4></center>
+<ul class="nav nav-tabs" id="cov" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="sample-tab" data-bs-toggle="tab" data-bs-target="#sample" type="button" role="tab" aria-controls="sample" aria-selected="true">Sample</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="modelimplied-tab" data-bs-toggle="tab" data-bs-target="#modelimplied" type="button" role="tab" aria-controls="modelimplied" aria-selected="false">Model-implied</button>
+</li></ul><div class="tab-content" id="covContent"><div class="tab-pane fade show active" id="sample" role="tabpanel" aria-labelledby="sample-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>x1</th>
+      <th>x2</th>
+      <th>x3</th>
+      <th>y1</th>
+      <th>y2</th>
+      <th>y3</th>
+      <th>y4</th>
+      <th>y5</th>
+      <th>y6</th>
+      <th>y7</th>
+      <th>y8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.53</td>
+      <td>0.98</td>
+      <td>0.81</td>
+      <td>0.72</td>
+      <td>0.61</td>
+      <td>0.78</td>
+      <td>1.14</td>
+      <td>1.07</td>
+      <td>0.84</td>
+      <td>0.92</td>
+      <td>1.09</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.98</td>
+      <td>2.25</td>
+      <td>1.78</td>
+      <td>1.26</td>
+      <td>1.47</td>
+      <td>1.53</td>
+      <td>2.21</td>
+      <td>2.04</td>
+      <td>1.78</td>
+      <td>1.97</td>
+      <td>2.20</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.81</td>
+      <td>1.78</td>
+      <td>1.95</td>
+      <td>0.90</td>
+      <td>1.15</td>
+      <td>1.03</td>
+      <td>1.81</td>
+      <td>1.56</td>
+      <td>1.55</td>
+      <td>1.60</td>
+      <td>1.67</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>0.72</td>
+      <td>1.26</td>
+      <td>0.90</td>
+      <td>6.79</td>
+      <td>6.17</td>
+      <td>5.76</td>
+      <td>6.01</td>
+      <td>5.00</td>
+      <td>5.67</td>
+      <td>5.73</td>
+      <td>5.60</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>0.61</td>
+      <td>1.47</td>
+      <td>1.15</td>
+      <td>6.17</td>
+      <td>15.37</td>
+      <td>5.76</td>
+      <td>9.38</td>
+      <td>5.53</td>
+      <td>9.26</td>
+      <td>7.43</td>
+      <td>7.65</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>0.78</td>
+      <td>1.53</td>
+      <td>1.03</td>
+      <td>5.76</td>
+      <td>5.76</td>
+      <td>10.62</td>
+      <td>6.60</td>
+      <td>4.87</td>
+      <td>4.66</td>
+      <td>6.91</td>
+      <td>5.56</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>1.14</td>
+      <td>2.21</td>
+      <td>1.81</td>
+      <td>6.01</td>
+      <td>9.38</td>
+      <td>6.60</td>
+      <td>11.07</td>
+      <td>5.63</td>
+      <td>7.34</td>
+      <td>7.39</td>
+      <td>7.91</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>1.07</td>
+      <td>2.04</td>
+      <td>1.56</td>
+      <td>5.00</td>
+      <td>5.53</td>
+      <td>4.87</td>
+      <td>5.63</td>
+      <td>6.73</td>
+      <td>4.91</td>
+      <td>5.74</td>
+      <td>5.27</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.84</td>
+      <td>1.78</td>
+      <td>1.55</td>
+      <td>5.67</td>
+      <td>9.26</td>
+      <td>4.66</td>
+      <td>7.34</td>
+      <td>4.91</td>
+      <td>11.22</td>
+      <td>6.66</td>
+      <td>8.14</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.92</td>
+      <td>1.97</td>
+      <td>1.60</td>
+      <td>5.73</td>
+      <td>7.43</td>
+      <td>6.91</td>
+      <td>7.39</td>
+      <td>5.74</td>
+      <td>6.66</td>
+      <td>10.66</td>
+      <td>7.49</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>1.09</td>
+      <td>2.20</td>
+      <td>1.67</td>
+      <td>5.60</td>
+      <td>7.65</td>
+      <td>5.56</td>
+      <td>7.91</td>
+      <td>5.27</td>
+      <td>8.14</td>
+      <td>7.49</td>
+      <td>10.39</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="modelimplied" role="tabpanel" aria-labelledby="modelimplied-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>x1</th>
+      <th>x2</th>
+      <th>x3</th>
+      <th>y1</th>
+      <th>y2</th>
+      <th>y3</th>
+      <th>y4</th>
+      <th>y5</th>
+      <th>y6</th>
+      <th>y7</th>
+      <th>y8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.53</td>
+      <td>0.98</td>
+      <td>0.82</td>
+      <td>0.67</td>
+      <td>0.84</td>
+      <td>0.70</td>
+      <td>0.84</td>
+      <td>0.81</td>
+      <td>0.96</td>
+      <td>1.04</td>
+      <td>1.03</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.98</td>
+      <td>2.25</td>
+      <td>1.78</td>
+      <td>1.45</td>
+      <td>1.82</td>
+      <td>1.53</td>
+      <td>1.83</td>
+      <td>1.77</td>
+      <td>2.10</td>
+      <td>2.27</td>
+      <td>2.25</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.82</td>
+      <td>1.78</td>
+      <td>1.95</td>
+      <td>1.21</td>
+      <td>1.52</td>
+      <td>1.28</td>
+      <td>1.53</td>
+      <td>1.48</td>
+      <td>1.75</td>
+      <td>1.89</td>
+      <td>1.87</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>0.67</td>
+      <td>1.45</td>
+      <td>1.21</td>
+      <td>6.83</td>
+      <td>6.21</td>
+      <td>5.23</td>
+      <td>6.25</td>
+      <td>5.14</td>
+      <td>5.36</td>
+      <td>5.78</td>
+      <td>5.72</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>0.84</td>
+      <td>1.82</td>
+      <td>1.52</td>
+      <td>6.21</td>
+      <td>15.18</td>
+      <td>6.57</td>
+      <td>9.17</td>
+      <td>5.68</td>
+      <td>8.89</td>
+      <td>7.27</td>
+      <td>7.19</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>0.70</td>
+      <td>1.53</td>
+      <td>1.28</td>
+      <td>5.23</td>
+      <td>6.57</td>
+      <td>10.60</td>
+      <td>6.61</td>
+      <td>4.78</td>
+      <td>5.67</td>
+      <td>6.91</td>
+      <td>6.05</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>0.84</td>
+      <td>1.83</td>
+      <td>1.53</td>
+      <td>6.25</td>
+      <td>9.17</td>
+      <td>6.61</td>
+      <td>11.05</td>
+      <td>5.72</td>
+      <td>6.78</td>
+      <td>7.31</td>
+      <td>7.58</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.81</td>
+      <td>1.77</td>
+      <td>1.48</td>
+      <td>5.14</td>
+      <td>5.68</td>
+      <td>4.78</td>
+      <td>5.72</td>
+      <td>6.77</td>
+      <td>5.24</td>
+      <td>5.66</td>
+      <td>5.60</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.96</td>
+      <td>2.10</td>
+      <td>1.75</td>
+      <td>5.36</td>
+      <td>8.89</td>
+      <td>5.67</td>
+      <td>6.78</td>
+      <td>5.24</td>
+      <td>11.17</td>
+      <td>6.71</td>
+      <td>7.99</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>1.04</td>
+      <td>2.27</td>
+      <td>1.89</td>
+      <td>5.78</td>
+      <td>7.27</td>
+      <td>6.91</td>
+      <td>7.31</td>
+      <td>5.66</td>
+      <td>6.71</td>
+      <td>10.67</td>
+      <td>7.16</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>1.03</td>
+      <td>2.25</td>
+      <td>1.87</td>
+      <td>5.72</td>
+      <td>7.19</td>
+      <td>6.05</td>
+      <td>7.58</td>
+      <td>5.60</td>
+      <td>7.99</td>
+      <td>7.16</td>
+      <td>10.34</td>
+    </tr>
+  </tbody>
+</table></div></div><br><center><h4>Model matrices</h4></center><ul class="nav nav-tabs" id="modelmatrices" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="mxBeta-tab" data-bs-toggle="tab" data-bs-target="#mxBeta" type="button" role="tab" aria-controls="mxBeta" aria-selected="true">Beta</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="mxGamma1-tab" data-bs-toggle="tab" data-bs-target="#mxGamma1" type="button" role="tab" aria-controls="mxGamma1" aria-selected="false">Gamma1</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="mxGamma2-tab" data-bs-toggle="tab" data-bs-target="#mxGamma2" type="button" role="tab" aria-controls="mxGamma2" aria-selected="false">Gamma2</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="mxLambda-tab" data-bs-toggle="tab" data-bs-target="#mxLambda" type="button" role="tab" aria-controls="mxLambda" aria-selected="false">Lambda</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="mxPsi-tab" data-bs-toggle="tab" data-bs-target="#mxPsi" type="button" role="tab" aria-controls="mxPsi" aria-selected="false">Psi</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="mxTheta-tab" data-bs-toggle="tab" data-bs-target="#mxTheta" type="button" role="tab" aria-controls="mxTheta" aria-selected="false">Theta</button>
+</li></ul><div class="tab-content" id="covContent"><div class="tab-pane fade show active" id="mxBeta" role="tabpanel" aria-labelledby="mxBeta-tab"><ul class="nav nav-tabs" id="Betasub" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="BetaEstimates-tab" data-bs-toggle="tab" data-bs-target="#BetaEstimates" type="button" role="tab" aria-controls="BetaEstimates" aria-selected="true">Estimates</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="BetaStart-tab" data-bs-toggle="tab" data-bs-target="#BetaStart" type="button" role="tab" aria-controls="BetaStart" aria-selected="false">Start</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="BetaNames-tab" data-bs-toggle="tab" data-bs-target="#BetaNames" type="button" role="tab" aria-controls="BetaNames" aria-selected="false">Names</button>
+</li></ul><div class="tab-content" id="Political DemocracysubContent"><div class="tab-pane fade show active" id="BetaEstimates" role="tabpanel" aria-labelledby="BetaEstimates-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.48</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.84</td>
+      <td>0.00</td>
+      <td>0.57</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="BetaStart" role="tabpanel" aria-labelledby="BetaStart-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="BetaNames" role="tabpanel" aria-labelledby="BetaNames-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_b23</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>_b25</td>
+      <td>0.00</td>
+      <td>_b24</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div></div></div><div class="tab-pane fade " id="mxGamma1" role="tabpanel" aria-labelledby="mxGamma1-tab"><ul class="nav nav-tabs" id="Gamma1sub" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="Gamma1Estimates-tab" data-bs-toggle="tab" data-bs-target="#Gamma1Estimates" type="button" role="tab" aria-controls="Gamma1Estimates" aria-selected="true">Estimates</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="Gamma1Start-tab" data-bs-toggle="tab" data-bs-target="#Gamma1Start" type="button" role="tab" aria-controls="Gamma1Start" aria-selected="false">Start</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="Gamma1Names-tab" data-bs-toggle="tab" data-bs-target="#Gamma1Names" type="button" role="tab" aria-controls="Gamma1Names" aria-selected="false">Names</button>
+</li></ul><div class="tab-content" id="Political DemocracysubContent"><div class="tab-pane fade show active" id="Gamma1Estimates" role="tabpanel" aria-labelledby="Gamma1Estimates-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="Gamma1Start" role="tabpanel" aria-labelledby="Gamma1Start-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="Gamma1Names" role="tabpanel" aria-labelledby="Gamma1Names-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div></div></div><div class="tab-pane fade " id="mxGamma2" role="tabpanel" aria-labelledby="mxGamma2-tab"><ul class="nav nav-tabs" id="Gamma2sub" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="Gamma2Estimates-tab" data-bs-toggle="tab" data-bs-target="#Gamma2Estimates" type="button" role="tab" aria-controls="Gamma2Estimates" aria-selected="true">Estimates</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="Gamma2Start-tab" data-bs-toggle="tab" data-bs-target="#Gamma2Start" type="button" role="tab" aria-controls="Gamma2Start" aria-selected="false">Start</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="Gamma2Names-tab" data-bs-toggle="tab" data-bs-target="#Gamma2Names" type="button" role="tab" aria-controls="Gamma2Names" aria-selected="false">Names</button>
+</li></ul><div class="tab-content" id="Political DemocracysubContent"><div class="tab-pane fade show active" id="Gamma2Estimates" role="tabpanel" aria-labelledby="Gamma2Estimates-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>5.05</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>4.79</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>3.56</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>5.46</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>4.26</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>6.56</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>4.45</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>5.14</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>2.98</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>6.20</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>4.04</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="Gamma2Start" role="tabpanel" aria-labelledby="Gamma2Start-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>2.53</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>2.40</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>1.78</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>2.73</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>2.13</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>3.28</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>2.23</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>2.57</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>1.49</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>3.10</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>2.02</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="Gamma2Names" role="tabpanel" aria-labelledby="Gamma2Names-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>_b12</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>_b13</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>_b14</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>_b15</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>_b16</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>_b17</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>_b18</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>_b19</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>_b20</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>_b21</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>_b22</td>
+    </tr>
+  </tbody>
+</table></div></div></div><div class="tab-pane fade " id="mxLambda" role="tabpanel" aria-labelledby="mxLambda-tab"><ul class="nav nav-tabs" id="Lambdasub" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="LambdaEstimates-tab" data-bs-toggle="tab" data-bs-target="#LambdaEstimates" type="button" role="tab" aria-controls="LambdaEstimates" aria-selected="true">Estimates</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="LambdaStart-tab" data-bs-toggle="tab" data-bs-target="#LambdaStart" type="button" role="tab" aria-controls="LambdaStart" aria-selected="false">Start</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="LambdaNames-tab" data-bs-toggle="tab" data-bs-target="#LambdaNames" type="button" role="tab" aria-controls="LambdaNames" aria-selected="false">Names</button>
+</li></ul><div class="tab-content" id="Political DemocracysubContent"><div class="tab-pane fade show active" id="LambdaEstimates" role="tabpanel" aria-labelledby="LambdaEstimates-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>2.18</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.82</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>1.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>1.26</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>1.06</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>1.26</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.00</td>
+      <td>1.19</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.00</td>
+      <td>1.28</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>0.00</td>
+      <td>1.27</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="LambdaStart" role="tabpanel" aria-labelledby="LambdaStart-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.84</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.53</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>1.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>0.91</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>0.85</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>0.89</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.00</td>
+      <td>1.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.00</td>
+      <td>0.73</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.00</td>
+      <td>0.85</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>0.00</td>
+      <td>0.78</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="LambdaNames" role="tabpanel" aria-labelledby="LambdaNames-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_b1</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_b2</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_b3</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>_b4</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>_b5</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>_b6</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>_b7</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.00</td>
+      <td>_b8</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.00</td>
+      <td>_b9</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.00</td>
+      <td>_b10</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>0.00</td>
+      <td>_b11</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div></div></div><div class="tab-pane fade " id="mxPsi" role="tabpanel" aria-labelledby="mxPsi-tab"><ul class="nav nav-tabs" id="Psisub" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="PsiEstimates-tab" data-bs-toggle="tab" data-bs-target="#PsiEstimates" type="button" role="tab" aria-controls="PsiEstimates" aria-selected="true">Estimates</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="PsiStart-tab" data-bs-toggle="tab" data-bs-target="#PsiStart" type="button" role="tab" aria-controls="PsiStart" aria-selected="false">Start</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="PsiNames-tab" data-bs-toggle="tab" data-bs-target="#PsiNames" type="button" role="tab" aria-controls="PsiNames" aria-selected="false">Names</button>
+</li></ul><div class="tab-content" id="Political DemocracysubContent"><div class="tab-pane fade show active" id="PsiEstimates" role="tabpanel" aria-labelledby="PsiEstimates-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>3.96</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+      <td>0.17</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.45</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="PsiStart" role="tabpanel" aria-labelledby="PsiStart-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>0.05</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.05</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="PsiNames" role="tabpanel" aria-labelledby="PsiNames-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>dem60</th>
+      <th>dem65</th>
+      <th>ind60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>dem60</th>
+      <td>_c16</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>dem65</th>
+      <td>0.00</td>
+      <td>_c13</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>ind60</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c20</td>
+    </tr>
+  </tbody>
+</table></div></div></div><div class="tab-pane fade " id="mxTheta" role="tabpanel" aria-labelledby="mxTheta-tab"><ul class="nav nav-tabs" id="Thetasub" role="tablist"><li class="nav-item" role="presentation">
+<button class="nav-link active" id="ThetaEstimates-tab" data-bs-toggle="tab" data-bs-target="#ThetaEstimates" type="button" role="tab" aria-controls="ThetaEstimates" aria-selected="true">Estimates</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="ThetaStart-tab" data-bs-toggle="tab" data-bs-target="#ThetaStart" type="button" role="tab" aria-controls="ThetaStart" aria-selected="false">Start</button>
+</li><li class="nav-item" role="presentation">
+<button class="nav-link " id="ThetaNames-tab" data-bs-toggle="tab" data-bs-target="#ThetaNames" type="button" role="tab" aria-controls="ThetaNames" aria-selected="false">Names</button>
+</li></ul><div class="tab-content" id="Political DemocracysubContent"><div class="tab-pane fade show active" id="ThetaEstimates" role="tabpanel" aria-labelledby="ThetaEstimates-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>x1</th>
+      <th>x2</th>
+      <th>x3</th>
+      <th>y1</th>
+      <th>y2</th>
+      <th>y3</th>
+      <th>y4</th>
+      <th>y5</th>
+      <th>y6</th>
+      <th>y7</th>
+      <th>y8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.08</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.00</td>
+      <td>0.12</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.47</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.89</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.62</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>7.37</td>
+      <td>0.00</td>
+      <td>1.31</td>
+      <td>0.00</td>
+      <td>2.15</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.07</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.79</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>1.31</td>
+      <td>0.00</td>
+      <td>3.15</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.35</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.62</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>2.35</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>2.15</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>4.95</td>
+      <td>0.00</td>
+      <td>1.36</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.79</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>3.43</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.35</td>
+      <td>0.00</td>
+      <td>1.36</td>
+      <td>0.00</td>
+      <td>3.25</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="ThetaStart" role="tabpanel" aria-labelledby="ThetaStart-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>x1</th>
+      <th>x2</th>
+      <th>x3</th>
+      <th>y1</th>
+      <th>y2</th>
+      <th>y3</th>
+      <th>y4</th>
+      <th>y5</th>
+      <th>y6</th>
+      <th>y7</th>
+      <th>y8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>0.26</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.00</td>
+      <td>1.13</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.97</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>3.39</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>7.69</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.31</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.53</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>3.37</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.61</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.33</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>5.20</td>
+    </tr>
+  </tbody>
+</table></div><div class="tab-pane fade " id="ThetaNames" role="tabpanel" aria-labelledby="ThetaNames-tab"><table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: center;">
+      <th></th>
+      <th>x1</th>
+      <th>x2</th>
+      <th>x3</th>
+      <th>y1</th>
+      <th>y2</th>
+      <th>y3</th>
+      <th>y4</th>
+      <th>y5</th>
+      <th>y6</th>
+      <th>y7</th>
+      <th>y8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x1</th>
+      <td>_c17</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>x2</th>
+      <td>0.00</td>
+      <td>_c14</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>x3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c19</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c2</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c5</td>
+      <td>0.00</td>
+      <td>_c3</td>
+      <td>0.00</td>
+      <td>_c4</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y3</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c7</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c6</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y4</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c3</td>
+      <td>0.00</td>
+      <td>_c9</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c8</td>
+    </tr>
+    <tr>
+      <th>y5</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c1</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c18</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y6</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c4</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c11</td>
+      <td>0.00</td>
+      <td>_c10</td>
+    </tr>
+    <tr>
+      <th>y7</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c6</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c12</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>y8</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>_c8</td>
+      <td>0.00</td>
+      <td>_c10</td>
+      <td>0.00</td>
+      <td>_c15</td>
+    </tr>
+  </tbody>
+</table></div></div></div></div>
+    </div>
+   </div>
+  </div>
+</div>
+<footer class="footer">
+      <div class="container">
+	<br>
+	<center>
+        <span class="text-muted">Generated by <a href="https://semopy.com"><b>semopy</b></a> v. 2.3.9.</span>
+	</center>
+      </div>
+    </footer>
+</body>
+<script>
+const menus = [document.getElementById("model_m"), document.getElementById("estimates_m"), document.getElementById("indices_m"), document.getElementById("matrices_m")];
+const headers = [document.getElementById("model"), document.getElementById("estimates"), document.getElementById("indices"), document.getElementById("matrices")];
+var cur = menus[0];
+cur.classList.add('active');
+window.addEventListener("scroll", function() {
+  headers.forEach(function(item, index, array) {
+    if (window.scrollY >= (item.offsetTop - 1.05 * item.offsetHeight)) {
+        item = menus[index];
+        cur.classList.remove("active");
+        cur = item;
+        cur.classList.add("active");
+  }
+});
+});
+</script>
+
+</html>

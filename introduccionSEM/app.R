@@ -552,10 +552,7 @@ ui <-
         )
       )
     ),
-    tabPanel(
-      title = "Ejemplo",
-    ),
-      tabPanel(div(img(src = "graph.png")))
+    tabPanel(div(img(src = "graph.png")))
       
     )
   )
