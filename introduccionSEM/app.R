@@ -552,8 +552,32 @@ ui <-
         )
       )
     ),
+    tabPanel(
+      title = "Código y Recursos",
+      fluidRow(
+        column(
+          width = 12,
+          tags$div(tags$ul(
+            uiOutput("url1"),
+            br(),
+            uiOutput("url2"),
+            br(),
+            uiOutput("url3"),
+            br(),
+            uiOutput("url4"),
+            br(),
+            uiOutput("url5"),
+            br(),
+            hr(),
+            tags$li("Si tu alma no es frecuentista y Bayes es la respuesta a tus plegarias, aquí una alternativa:"),
+            br(),
+            uiOutput("url6"),
+            br(),
+            uiOutput("url7")
+          )))
+        )
+      ),
     tabPanel(div(img(src = "graph.png")))
-      
     )
   )
 
@@ -561,9 +585,9 @@ ui <-
 server <- function(input, output, session) {
   library(shiny)
   
-  
-  output$ex1 <- renderUI({
+    output$ex1 <- renderUI({
     withMathJax(helpText('Dynamic output 1:  $$\\alpha^2$$'))
+      
   })
   
   output$show_string <- renderText({
@@ -582,241 +606,47 @@ server <- function(input, output, session) {
   
   })
   
-  #
-  # library(tidyverse)
-  # library(lubridate)
-  # library(hrbrthemes)
-  # library(viridis)
-  # library(kableExtra)
-  # library(rsample)
-  # library(xgboost)
-  # library(corrplot)
-  # library(yaml)
-  # library(data.table)
-  # library(SHAPforxgboost)
-  # library(streamgraph)
-  # library(RColorBrewer)
-  # library(ggcorrplot)
-  # library(gganimate)
-  # library(wesanderson)
-  #
-  # source('code/xgb_functions.R')
-  # source('code/viz.R')
-  #
-  # jd_colours_blues <- c("#F7FBFF","#DEEBF7" ,"#C6DBEF" ,"#9ECAE1", "#6BAED6" ,"#4292C6", "#2171B5", "#08519C", "#08306B")
-  # jd_colours_many <- c("#2171B5", "#08519C",'#FFC300', '#D70040', '#D2042D', '#DC143C', '#D3D3D3','#7F7F7F', '#FFDB58')
-  #
-  # raw_data <- read_csv('data/mexico_market_data_recategorised.csv')
-  # indices_file = 'data/recat_all_indices_mexico.csv'
-  # loss_file = 'data/recat_loss_table_mexico.csv'
-  #
-  # indices = read_csv(indices_file) %>%
-  #   select(-`...1`) %>%
-  #   mutate(date = as_date(date),
-  #          category = recode(category,
-  #                            Total='ICCMX',
-  #                            apoyo_y_seguridad = 'support and security',
-  #                            estabilidad_laboral = 'work stability',
-  #                            factores_externos = 'external factors',
-  #                            gastos = 'expenses',
-  #                            grandes_gastos = 'large expenses',
-  #                            inversion_y_ahorro = 'investment and savings',
-  #                            ocio = 'leisure'
-  #          )
-  #   )
-  #
-  #
-  # modelling_data <-
-  #   indices %>%
-  #   pivot_wider(id_cols = date,
-  #               names_from = c(category,
-  #                              sub_category),
-  #               names_sep = '_',
-  #               values_from = index)
-  #
-  # names(modelling_data) <- str_remove(str_replace_all(replacement = "_",
-  #                                                     string = tolower(names(modelling_data)),
-  #                                                     pattern = " "
-  # ),
-  # '_na'
-  # )
-  #
-  # corr_table <-
-  #   indices %>%
-  #   pivot_wider(id_cols = date,
-  #               names_from = c(category, sub_category),
-  #               names_glue = "{category}_{sub_category}",
-  #               values_from = index) %>%
-  #   rename_with(.,
-  #               .fn = ~ tolower(str_remove(string = .,
-  #                                          pattern = '_NA')),
-  #               .cols = everything()) %>%
-  #   select(-date) %>%
-  #   cor(., method = 'p')
-  #
-  # xvars =  c("support_and_security" ,
-  #            "work_stability",
-  #            "external_factors",
-  #            "expenses",
-  #            "large_expenses",
-  #            "investment_and_savings",
-  #            "leisure")
-  #
-  # yvar = 'iccmx'
-  #
-  # df_date <- modelling_data %>% select(date, xvars, yvar)
-  #
-  # df <- df_date %>% select(-date)
-  #
-  # dsplit <- initial_split(df_date, prop = 0.85)
-  #
-  # train_data_date <- training(dsplit)
-  #
-  # train_data <- train_data_date %>% select(-date)
-  #
-  # test_data_date <- testing(dsplit)
-  #
-  # test_data <- test_data_date %>% select(-date)
-  #
-  # XGB_All <- xgb.DMatrix(as.matrix(df[xvars]),label=df[[yvar]])
-  #
-  # XGB_Train <- xgb.DMatrix(as.matrix(train_data[xvars]), label=train_data[[yvar]])
-  #
-  # XGB_Test <- xgb.DMatrix(as.matrix(test_data[xvars]), label=test_data[[yvar]])
-  #
-  # XGB <- list()
-  #
-  # XGB <- searchXGB(XGB_Train,
-  #                  XGB_Test,
-  #                  XGB_All)
-  #
-  # output$cover <- renderImage({
-  #
-  #   outfile <- tempfile(pattern="outfile", fileext='.png')
-  #
-  #   anim <-
-  #     indices %>%
-  #     filter(category != 'ICCMX',
-  #            category != 'support and security',
-  #            is.na(sub_category)) %>%
-  #     ggplot(., aes(x=date, y=index, colour=factor(category), alpha=0.8)) +
-  #     geom_line() +
-  #     theme_ipsum() +
-  #     scale_colour_manual(values = c(wes_palettes$Darjeeling1,wes_palettes$Darjeeling1[1])) +
-  #     theme(
-  #       legend.position="none",
-  #       panel.spacing = unit(0.1, "lines"),
-  #       strip.text.x = element_blank(),
-  #       plot.title = element_blank(),
-  #       axis.text.y = element_blank(),
-  #       axis.text.x = element_blank()
-  #     ) +
-  #     ylab('') +
-  #     xlab('') +
-  #     #      facet_wrap(~category) +
-  #     transition_reveal(date)
-  #
-  #   anim_save("outfile.png", animate(anim, height = 529, width = 856, units = "px", bg = 'transparent'))
-  #
-  #   list(src = "outfile.png",
-  #        contentType = 'image/png',
-  #        width = 856,
-  #        height = 529,
-  #        alt = "This is alternate text"
-  #   )}, deleteFile = TRUE)
-  #
-  # output$iccmx <- renderPlot({
-  #   indices %>%
-  #     filter(category == 'ICCMX') %>%
-  #     select(date, index) %>%
-  #     arrange(date) %>%
-  #     ggplot(aes(x=date, y=index)) +
-  #     geom_line(colour=wes_palettes$Darjeeling1[2]) +
-  #     stat_smooth(method=loess,
-  #                 level=0.99,
-  #                 fullrange=T,
-  #                 alpha=0.8,
-  #                 se=F,
-  #                 span=0.5,
-  #                 linetype=9,
-  #                 colour=wes_palettes$Darjeeling1[3]) +
-  #     theme_ipsum() +
-  #     theme(
-  #       text = element_text(colour="lightgray"),
-  #       legend.position="none",
-  #       panel.spacing = unit(0.1, "lines"),
-  #       strip.text.x = element_text(
-  #         colour="lightgray"),
-  #       plot.title = element_text(
-  #         colour="lightgray"),
-  #       axis.text.y = element_text(
-  #         colour="lightgray"),
-  #       axis.text.x = element_text(
-  #         colour="lightgray")
-  #     ) +
-  #     ylab('index') +
-  #     xlab('date')})
-  #
-  # output$dimensions <- renderPlot({
-  #
-  #   indices %>%
-  #     filter(category != 'ICCMX',
-  #            is.na(sub_category)) %>%
-  #     ggplot(., aes(x=date, y=index,colour=category,alpha=0.8)) +
-  #     geom_line() +
-  #     stat_smooth(method=loess,
-  #                 level=0.99,
-  #                 fullrange=T,
-  #                 alpha=0.8,
-  #                 se=F,
-  #                 span=0.5,
-  #                 linetype=9,
-  #                 colour=sample(jd_colours_blues[6]))+
-  #     scale_colour_manual(values = c(wes_palettes$Darjeeling1,wes_palettes$Darjeeling1[1:2])) +
-  #     theme_ipsum() +
-  #     theme(
-  #       text = element_text(colour="lightgray"),
-  #       legend.position="none",
-  #       panel.spacing = unit(0.1, "lines"),
-  #       strip.text.x = element_text(colour="lightgray"),
-  #       plot.title = element_text(colour="lightgray"),
-  #       axis.text.y = element_text(colour="lightgray"),
-  #       axis.text.x = element_text(colour="lightgray")
-  #     ) +
-  #     ylab('dimension') +
-  #     facet_wrap(~category)
-  #
-  # })
-  #
-  #
-  # output$correlations <-renderPlot({
-  #   make_corrplot(indices)
-  # }, height = 800, width = 800 )
-  #
-  #
-  # output$shapviz <- renderPlot({
-  #
-  #   make_shap_viz(shap_viz_name = '',
-  #                 yvar = 'iccmx',
-  #                 finalXGB = XGB$finalXGB,
-  #                 dataz = modelling_data[c(xvars,yvar)]
-  #   )
-  #
-  # })
-  #
-  # output$tseries_shap <- renderPlot({
-  #
-  #   make_tseries_shap(
-  #
-  #     XGB,
-  #     df,
-  #     df_date,
-  #     jd_colours_many,
-  #     yvar='iccmx')
+  url1 <- a("Introduction to Structural Equation Modeling (SEM) in R with Lavaan", href="https://lavaan.ugent.be/")
   
-  #})
+  url2 <- a("Step by step SEM with with Lavaan", href="https://stats.oarc.ucla.edu/r/seminars/rsem/")
   
+  url3 <- a("Structural Equation Modelling with python", href="https://semopy.com/")
+
+  url4 <- a("Factor Analysis Step by Step", href="https://towardsdatascience.com/exploratory-factor-analysis-in-r-e31b0015f224")
+
+  url5 <- a("Análisis de Componentes Principales (Principal Component Analysis, PCA) y t-SNE", href="https://www.cienciadedatos.net/documentos/35_principal-component-analysis")
   
+  url6 <- a("CausalNex - Paquete de python para Probabilistic Graphical Models (PGM) -- Redes Bayesianas", href="https://causalnex.readthedocs.io/en/latest/")
+  
+  url7 <- a("PGM Stanford Course", href="https://www.coursera.org/specializations/probabilistic-graphical-models")
+  
+  output$url1 <- renderUI({
+    tagList(url1)
+  })
+  
+  output$url2 <- renderUI({
+    tagList(url2)
+  })
+  
+  output$url3 <- renderUI({
+    tagList(url3)
+  })
+  
+  output$url4 <- renderUI({
+    tagList(url4)
+  })
+  
+  output$url5 <- renderUI({
+    tagList(url5)
+  })
+  
+  output$url6 <- renderUI({
+    tagList(url6)
+  })
+  
+  output$url7 <- renderUI({
+    tagList(url7)
+  })
   
 }
 # Run the app ----
