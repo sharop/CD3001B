@@ -135,8 +135,9 @@ plot_confusion_matrix <- function(df,
              yhat = as_factor(yhat)) %>% 
       ggplot(aes(y,yhat)) +
       geom_tile(aes(fill=n), colour="white") +
-      geom_text(aes(label = sprintf("%1.0f", n)), vjust = 1, colour='white', size=10) + 
-      theme_ipsum() + 
+      geom_text(aes(label = sprintf("%1.0f", n)), vjust = 1, colour='white', size=12) + 
+      theme_bw() + 
+      scale_fill_gradient(low = "blue", high = "lightblue") +
       theme(legend.position = "none") +
       ylab("Predicted Labels") +
       xlab("Observed Labels") +
@@ -172,13 +173,13 @@ visualize_all_variables <- function(data) {
         geom_bar(stat = 'count', colour='lightblue',alpha=0.6) +
         theme_ipsum() +
         theme(
-          text = element_text(colour="lightblue"),
+          text = element_text(colour="white"),
           axis.text.x = element_text(
-            colour="lightblue", size=10),
+            colour="white", size=12),
           axis.text.y = element_text(
-            colour="lightblue", size=10),
+            colour="white", size=12),
           legend.title=element_text(
-            colour="lightblue", size=10)
+            colour="white", size=12)
           
         )
       
@@ -188,13 +189,13 @@ visualize_all_variables <- function(data) {
         geom_bar(colour='lightblue',alpha=0.6) +
         theme_ipsum() +
         theme(
-          text = element_text(colour="lightblue"),
+          text = element_text(colour="white"),
           axis.text.x = element_text(
-            colour="lightblue", size=10),
+            colour="white", size=12),
           axis.text.y = element_text(
-            colour="lightblue", size=10),
+            colour="white", size=12),
           legend.title=element_text(
-            colour="lightblue", size=10)
+            colour="white", size=12)
           
         )
       
@@ -204,13 +205,13 @@ visualize_all_variables <- function(data) {
         geom_density(colour='lightblue',alpha=0.6) +
         theme_ipsum() +
         theme(
-          text = element_text(colour="lightblue"),
+          text = element_text(colour="white"),
           axis.text.x = element_text(
-            colour="lightblue", size=10),
+            colour="white", size=12),
           axis.text.y = element_text(
-            colour="lightblue", size=10),
+            colour="white", size=12),
           legend.title=element_text(
-            colour="lightblue", size=10)
+            colour="white", size=12)
           
         )
       
@@ -236,9 +237,9 @@ make_roc_table <- function(model,
   
   by <- (upper_limit-lower_limit) / nrows
   
-  intervals <- seq(from = upper_limit, 
-                   to = lower_limit, 
-                   by = -by
+  intervals <- seq(from = lower_limit, 
+                   to = upper_limit, 
+                   by = by
   )
   
   TN=c()
@@ -313,19 +314,17 @@ plot_cm_slider <- function(TN, FP, FN, TP){
   observed <- factor(c(0, 0, 1, 1))
   predicted <- factor(c(0, 1, 0, 1))
   Y <- c(TN, FP, FN, TP)
-  
   return(
-    data.frame(observed, 
-               predicted, Y) %>% 
-      ggplot(data =  df, 
-             mapping = aes(x = observed, y = predicted)) +
-      geom_tile(aes(fill = Y), 
-                colour = "white") +
-      geom_text(aes(label = sprintf("%1.0f", Y)), vjust = 1, colour='white', size=10) + 
-      scale_fill_gradient(low = "blue", high = "lightblue") +
-      theme_bw() + theme(legend.position = "none")
+  data.frame(observed, 
+             predicted, Y) %>% 
+    ggplot(aes(x = observed, y = predicted)) +
+    geom_tile(aes(fill = Y, 
+                  colour = "white")) +
+    geom_text(aes(label = sprintf("%1.0f", Y)), vjust = 1, colour='white', size=12) + 
+    scale_fill_gradient(low = "blue", high = "lightblue") +
+    theme_bw() + 
+    theme(legend.position = "none")
   )
-  
 }
 
 make_shap_viz <- function(dataz, finalXGB, yvar, shap_viz_name, ...){
@@ -334,7 +333,7 @@ make_shap_viz <- function(dataz, finalXGB, yvar, shap_viz_name, ...){
   
   dataMatrix <-
     dataz %>% 
-    select(-(yvar)) %>% 
+    select(!(all_of(yvar))) %>% 
     as.matrix
   
   shap_viz <-
@@ -363,13 +362,13 @@ make_shap_viz <- function(dataz, finalXGB, yvar, shap_viz_name, ...){
          x = 'Dimension') +
     theme(legend.position = 'bottom') +
     theme(
-      text = element_text(colour="lightblue",size=10),
+      text = element_text(colour="white",size=12),
       axis.text.x = element_text(
-        colour="lightblue"),
+        colour="white"),
       axis.text.y = element_text(
-        colour="lightblue"),
+        colour="white"),
       legend.title=element_text(
-        colour="lightblue")
+        colour="white")
       
     )
   

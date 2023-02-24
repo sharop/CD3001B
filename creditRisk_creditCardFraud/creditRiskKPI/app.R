@@ -52,15 +52,36 @@ thematic_shiny(font = "auto")
         tabPanel("Classification Model",
                  plotOutput('loss_viz'),
                  hr(),
-                 plotOutput('shap_viz')),
-        tabPanel("Thresholding - KPI",
-                 sliderInput("bins",
+                 plotOutput('shap_viz'),
+                 hr(),
+                 fluidRow(
+                   column(width = 6, 
+                          plotOutput('cm_train')
+                          ),
+                   column(width = 6,
+                          plotOutput('cm_test')
+                          )
+                 )
+                 ),
+        tabPanel("Thresholding",
+                 sliderInput("decimal",
                              "Score Threshold:",
-                             min = 1,
-                             max = 50,
-                             value = 30),
-                 plotOutput("distPlot")
-        ),
+                             min = 6,
+                             max = 100,
+                             value = 0,
+                             ticks = T),
+                 tableOutput("values"),
+                 hr(),
+                 fluidRow(
+                   column(width = 6, 
+                          plotOutput('dynamic_roc')
+                          ),
+                   column(width = 6,
+                         plotOutput('dynamic_metrics')
+                          )
+                   )
+                 ),
+        tabPanel("KPI: Lending Target"),         
         tabPanel(div(img(src = "binoculars.png")
                      )
                  )
@@ -116,6 +137,7 @@ df1 <-
          -loan_int_rate)
   
 output$head_kable  <- function() {
+  
   df1 %>%
     head %>%
     kable(.,
@@ -196,25 +218,24 @@ output$head_kable  <- function() {
   
   train_xgb = makeXGBMatrix(train_data, xvars = xvars, yvar = yvar)
   test_xgb = makeXGBMatrix(test_data, xvars = xvars, yvar = yvar)
-  #valid_xgb =  makeXGBMatrix(validation_data, xvars = xvars, yvar = yvar)
-  
+
   finalXGB <-
     searchXGB(train_xgb,
               test_xgb)
   
-  a <-  df %>%
+  a <-  df1 %>%
     ggplot(aes(loan_amnt, fill = loan_grade, colour = loan_grade)) +
     geom_histogram(alpha = 0.5, position = "fill") +
     theme_ipsum() +
     theme(legend.position = 'bottom') +
     theme(
-      text = element_text(colour="lightblue"),
+      text = element_text(colour="white"),
       axis.text.x = element_text(
-        colour="lightblue"),
+        colour="white"),
       axis.text.y = element_text(
-        colour="lightblue"),
+        colour="white"),
       legend.title=element_text(
-        colour="lightblue")
+        colour="white")
       
     )
   
@@ -230,13 +251,13 @@ output$head_kable  <- function() {
     theme_ipsum() +
     theme(legend.position = 'bottom') +
     theme(
-      text = element_text(colour="lightblue"),
+      text = element_text(colour="white"),
       axis.text.x = element_text(
-        colour="lightblue"),
+        colour="white"),
       axis.text.y = element_text(
-        colour="lightblue"),
+        colour="white"),
       legend.title=element_text(
-        colour="lightblue")
+        colour="white")
       
     )
   
@@ -267,7 +288,7 @@ output$head_kable  <- function() {
       model = finalXGB$finalXGB,
       data = train_xgb,
       yflag = train_data$flag,
-      nrows = 200,
+      nrows = 100,
       obs_pred_df_raw = obs_pred_df_raw
     )
   
@@ -276,21 +297,9 @@ output$head_kable  <- function() {
       model = finalXGB$finalXGB,
       data = test_xgb,
       yflag = test_data$flag,
-      nrows = 200,
+      nrows = 100,
       obs_pred_df_raw = obs_pred_df_raw
     )
-  
-    output$distPlot <- renderPlot({
-        
-      # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
     
     output$loangrade <- renderPlot({
       a
@@ -303,7 +312,83 @@ output$head_kable  <- function() {
     output$shap_viz <- renderPlot({
       c
     })
+
+    sliderValues <- reactive({
+      
+      roc_table_test[1:input$decimal,] 
+      
+    })
+    
+    output$values <- function()({
+      sliderValues() %>% 
+        tail %>% 
+        kable(.,
+              format = "html",
+              booktabs = TRUE) %>%
+        kable_styling(font_size = 12,"striped") %>%
+        scroll_box(width = "100%")
+    })    
+  
+    output$dynamic_roc <- renderPlot({
+      
+      plot_cm_slider(TP=sliderValues() %>% 
+                       tail(1) %>% 
+                       select(TP) %>% 
+                       unlist,
+                     FP=sliderValues() %>% 
+                       tail(1) %>% 
+                       select(FP) %>% 
+                       unlist,
+                     TN=sliderValues() %>% 
+                       tail(1) %>% 
+                       select(TN) %>% 
+                       unlist,
+                     FN=sliderValues() %>% 
+                       tail(1) %>% 
+                       select(FN) %>% 
+                       unlist
+      )
+      
+    })
+    
+    output$dynamic_metrics <- renderPlot({
+      
+      sliderValues() %>% 
+        rename(recall=TPR_recall) %>% 
+        drop_na() %>% 
+        pivot_longer(names_to = 'metric',
+                     values_to = 'value',
+                     cols = c('lift', 'precision','recall')) %>% 
+        ggplot(aes(x=threshold, y=value, group=metric, colour=metric)) +
+        geom_line() +
+        theme_ipsum() +
+        xlim(c(0.05, .8)) +
+        scale_colour_manual(values=c("#000066","#339999",'lightblue'))+
+        theme(
+          legend.position = 'bottom',
+          text = element_text(colour="white",size=12),
+          axis.text.x = element_text(
+            colour="white"),
+          axis.text.y = element_text(
+            colour="white"),
+          legend.title=element_text(
+            colour="white"),
+          strip.text = element_text(colour = 'white')
+          
+        ) + facet_wrap(~metric, nrow=3)
+    
+    })    
+  
+    output$cm_train <- renderPlot({
+      cm_train
+    })
+    
+    output$cm_test <- renderPlot({
+      cm_test
+    })
+    
 }
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
