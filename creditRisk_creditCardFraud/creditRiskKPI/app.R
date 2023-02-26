@@ -23,6 +23,7 @@ ui <-
                  tags$pre(
                    "
 
+
  ██████╗██████╗ ███████╗██████╗ ██╗████████╗    ██████╗ ██╗███████╗██╗  ██╗
 ██╔════╝██╔══██╗██╔════╝██╔══██╗██║╚══██╔══╝    ██╔══██╗██║██╔════╝██║ ██╔╝
 ██║     ██████╔╝█████╗  ██║  ██║██║   ██║       ██████╔╝██║███████╗█████╔╝
@@ -31,11 +32,39 @@ ui <-
  ╚═════╝╚═╝  ╚═╝╚══════╝╚═════╝ ╚═╝   ╚═╝       ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝
 
 
+
 "
                  )
                )),
                br(),
-               br()),
+               hr(),
+               p(
+                 "The definition of a KPI, or a key performance indicator, is a measurable value used to evaluate how successful a person or organization is at reaching a target."
+               ),
+               br(),
+               p(
+                 "KPIs should be aligned with the overall business strategy and outcomes, they should also be actionable, realistic and measurable."
+               ),
+               br(),
+               p(
+                 "This app explores lending KPIs (i.e. classification metrics and their impact on revenue) and how to adjust them through modelling users' propensity to default on their loans."
+               ),
+               br(),
+               p(
+                 "A credit-risk data set was used to this end. 20% of the sample was left for KPI adjustment." 
+               ),
+               br(),
+               p(
+                 "Out of the 80% used for modelling, 80% was set for training and 20% for testing the model.",
+               ),
+               br(),
+               p(
+                 "A random hyper-parameter search was used to optimise a decision tree ensemble fit using xgboost."
+               ),
+               br(),
+               p(
+                 "Variable contribution was visualised using Shapley additive values"
+               )),
       tabPanel(
         "Intro - Data Viz",
         tableOutput("head_kable"),
@@ -81,7 +110,7 @@ ui <-
         br(),
         sliderInput(
           'prestamo',
-          "Average Loan Amount ($):",
+          "KPI 1: Average Loan Amount ($):",
           min = 3000,
           max = 7000,
           value = 3000,
@@ -89,7 +118,7 @@ ui <-
         ),
         sliderInput(
           'duracion',
-          "Average Duration (months):",
+          "KPI 2: Average Duration (months):",
           min = 1,
           max = 12,
           value = 6,
@@ -97,7 +126,7 @@ ui <-
         ),
         sliderInput(
           'interes',
-          "Average Monthly Interest Rate (%):",
+          "KPI 3: Average Monthly Interest Rate (%):",
           min = 0.01,
           max = 0.4,
           value = 0.1,

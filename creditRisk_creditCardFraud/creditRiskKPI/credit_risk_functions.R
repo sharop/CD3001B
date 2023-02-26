@@ -10,7 +10,7 @@ searchXGB <- function(train_xgb, test_xgb) {
   best_auc_mean = 0
   best_params = list()
   
-  for (i in 1:3) {
+  for (i in 1:10) {
     params = list(
       tree_method = 'exact',
       booster = 'gbtree',
