@@ -23,14 +23,8 @@ df <-
                            "n" ~ 0,
                            "y" ~ 1)) %>%
   select(-cb_person_default_on_file,
-         -loan_grade) %>%
-  drop_na()
-
-apetite <- initial_split(df, prop = 0.80, strata = 'flag')
-
-df <- training(apetite)
-
-riskApetiteSample <- testing(apetite)
+         -person_emp_length,
+         -loan_int_rate)
 
 df %>%
   head %>%
@@ -44,7 +38,7 @@ df %>%
   glimpse()
 
 df %>%
-  ggplot(aes(loan_amnt, fill = loan_intent, colour = loan_intent)) +
+  ggplot(aes(loan_amnt, fill = loan_grade, colour = loan_grade)) +
   geom_histogram(alpha = 0.5, position = "fill") +
   theme_ipsum() +
   theme(legend.position = 'bottom')
@@ -57,7 +51,8 @@ df <-
     remove_selected_columns = T,
     remove_first_dummy = T,
     select_columns = c("person_home_ownership",
-                       "loan_intent")
+                       "loan_intent",
+                       "loan_grade")
   ) %>%
   map_if(
     .p = function(x)
@@ -68,6 +63,11 @@ df <-
   as_tibble
 
 ### ROSE
+
+df %>%
+  map(.,
+      function(x)
+        sum(is.na(.)))
 
 df_split <- initial_split(df, prop = 0.80)
 
@@ -92,6 +92,7 @@ yvar = 'flag'
 
 train_xgb = makeXGBMatrix(train_data, xvars = xvars, yvar = yvar)
 test_xgb = makeXGBMatrix(test_data, xvars = xvars, yvar = yvar)
+#valid_xgb =  makeXGBMatrix(validation_data, xvars = xvars, yvar = yvar)
 
 finalXGB <-
   searchXGB(train_xgb,
@@ -134,34 +135,17 @@ roc_table_test <-
   )
 
 
-finalXGB$finalXGB$evaluation_log %>%
-  as_tibble %>%
-  pivot_longer(
-    cols = c('train_auc', 'test_auc'),
-    values_to = 'auc',
-    names_to = 'sample'
-  ) %>%
-  ggplot(aes(iter, auc, col = sample, group = sample)) +
-  geom_line(alpha = 0.6) +
+finalXGB$finalXGB$evaluation_log %>% 
+  as_tibble %>% 
+  pivot_longer(cols = c('train_auc','test_auc'),
+               values_to = 'auc',
+               names_to = 'sample') %>% 
+  ggplot(aes(iter,auc,col=sample,group=sample)) +
+  geom_line(alpha=0.6) +
   theme_ipsum() +
-  scale_colour_manual(name = '', values = c("blue", 'lightblue'))
+  scale_colour_manual(name='',values=c("blue", 'lightblue'))
+  
 
 
-tibble(
-  flag = riskApetiteSample$flag,
-  prob = predict(finalXGB$finalXGB, riskApetiteXGB)
-) %>%
-  group_by(prob) %>%
-  summarise(
-    score_defaulters = sum(flag),
-    score_non_defaulters = length(flag) - sum(flag),
-  ) %>%
-  arrange(prob) %>%
-  mutate(
-    total_defaulters = cumsum(score_defaulters),
-    total_non_defaulters = cumsum(score_non_defaulters)
-  ) %>%
-  group_by(prob, total_defaulters, total_non_defaulters) %>%
-  summarise(total = sum(total_defaulters, total_non_defaulters)) %>% 
-  ungroup()
-
+ 
+  
