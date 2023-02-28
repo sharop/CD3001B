@@ -11,10 +11,11 @@ searchXGB <- function(train_xgb, test_xgb) {
   best_params = list()
   
   for (i in 1:10) {
+    
     params = list(
       tree_method = 'exact',
       booster = 'gbtree',
-      eta = runif(1, 0.1, 0.3),
+      eta = runif(1, 0.01, 0.3),
       max_depth = sample(5:14, 1),
       lambda = runif(1, 0.01, 0.4),
       alpha = runif(1, 0.01, 0.4),

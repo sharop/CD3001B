@@ -27,7 +27,8 @@ makeXGBMatrix <- function(xvars, yvar, df){
     df %>% 
     select(all_of(xvars)) %>% 
     as.matrix %>% 
-    xgb.DMatrix(., label=df[[yvar]])
+    xgb.DMatrix(., 
+                label=df[[yvar]])
   
   return(XGBmatrix)
   
@@ -48,15 +49,15 @@ xgb.train(
     eta=0.3,
     gamma=5,
     max_depth=6,
-    subsample=0.8,
-    lambda=0.001,
-    alpha=0.001,
+    subsample=0.8, 
+    lambda=0.001, #L2 Ridge
+    alpha=0.001, #L1 Lasso
     objective='reg:logistic',
     eval_metric='auc'
   ),
   data=xgbTrain,
   nrounds=50,
-  early_stopping_rounds=,
+  early_stopping_rounds=3,
   watchlist = list(training = xgbTrain,
                    testing = xgbTest),
   maximize=T
@@ -69,4 +70,3 @@ t$evaluation_log %>%
   ggplot(aes(iter, value, group=sample, colour=sample)) +
   geom_line()
       
-  )
