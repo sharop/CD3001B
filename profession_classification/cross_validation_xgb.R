@@ -52,7 +52,7 @@ xgbTest <- makeXGBMatrix(xvars=xvars,
 
 fitxgboost <- function(xgbTrain, xgbTest, iterations){
   
-  # iniciar el valor de la metrica del cual partimos (alto para metricas que queremos reducir
+  # iniciar el valor de la métrica del cual partimos (alto para métricas que queremos reducir
   # y viceversa)
   
   auc = 0
@@ -60,8 +60,8 @@ fitxgboost <- function(xgbTrain, xgbTest, iterations){
   
   for (i in 1:iterations){
     
-    # muestrear numeros de forma aleatoria (dentro de un rango) para los hyperparámetros 
-    # cada iteracion 
+    # muestrear números de forma aleatoria (dentro de un rango) para los hiperparámetros 
+    # cada iteración 
       
     hparams = list(
       eta = runif(1, 0.01, 0.3),
@@ -74,7 +74,7 @@ fitxgboost <- function(xgbTrain, xgbTest, iterations){
   )  
 
 
-    # ajustar un modelo utilizando validacion cruzada para probar los hiperparámetros en
+    # ajustar un modelo utilizando validación cruzada para probar los hiperparámetros en
     # todas las regiones de los datos de entrenamiento
     
   xgbCV <- xgb.cv(
@@ -90,13 +90,13 @@ fitxgboost <- function(xgbTrain, xgbTest, iterations){
     verbose = 2
   )
   
-  # registrar la metrica
+  # registrar la métrica
   
   auc2 <- xgbCV$evaluation_log[xgbCV$best_iteration]$test_auc_mean
   
-  # si la metrica alcanzada fuera mejor que la actual, reemplazar la actual  y guardar los
+  # si la métrica alcanzada fuera mejor que la actual, reemplazar la actual  y guardar los
   # hiperparámetros del modelo que llegó a ella.
-  # Nota : la metrica debe ser menor si se esta reduciendo (ej rmse) o mayor si se esta aumentando (ej auc)
+  # Nota : la métrica debe ser menor si se esta reduciendo (ej rmse) o mayor si se esta aumentando (ej auc)
   
   
   if(auc2 > auc){
@@ -119,7 +119,7 @@ fitxgboost <- function(xgbTrain, xgbTest, iterations){
   return(finalmodel)
 }
 
-# correr la funcion 
+# correr la función 
 
 modelo <- fitxqboost(xgbTrain, xgbTest, iterations = 10)
 
