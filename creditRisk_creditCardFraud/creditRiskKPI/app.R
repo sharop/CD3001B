@@ -11,6 +11,7 @@ library(shiny)
 library(thematic)
 
 thematic_shiny(font = "auto")
+
 ui <-
   fluidPage(
     navbarPage(
@@ -136,8 +137,10 @@ ui <-
         br(),
         textOutput('ganancia')
       ),
-      tabPanel(div(img(src = "binoculars.png")))
-      
+      tabPanel(
+        div(img(src = "binoculars.png")
+            )
+        )
     )
   )
 
@@ -225,8 +228,8 @@ server <- function(input, output) {
       "$",
       format(
         (
-          cantidad_promedio * duracion_promedio * interes_promedio * (1000000000 / cantidad_promedio)
-        ) - (debt$total_defaulters * cantidad_promedio) - 1000000000
+          cantidad_promedio * duracion_promedio * interes_promedio * (10000000 / cantidad_promedio)
+        ) - (debt$total_defaulters * cantidad_promedio) - 10000000
       ,
       big.mark = ","
     ))

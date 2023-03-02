@@ -22,7 +22,7 @@ searchXGB <- function(train_xgb, test_xgb) {
       gamma = runif(1, 0, 20),
       subsample = runif(1, .5, 1),
       colsample_bytree = runif(1, .5, 1),
-      objective = 'binary:logitraw',
+      objective = 'binary:logitraw', # reg:logistic
       eval_metric = 'auc'
     )
     
@@ -71,6 +71,7 @@ searchXGB <- function(train_xgb, test_xgb) {
 }
 
 splitTrainTest <- function(df, strat_var = NULL) {
+  
   split <- initial_split(df, prop = .75, strata = strat_var)
   
   return(list(train = training(split),
@@ -146,10 +147,10 @@ all_model_metrics <- function(df) {
       
     )
   )
-  
 }
 
 visualize_all_variables <- function(data) {
+  
   # Create an empty list to store the visualizations
   plot_list <- list()
   
@@ -214,6 +215,7 @@ make_roc_table <- function(model,
                            yflag,
                            nrows,
                            obs_pred_df_raw) {
+  
   upper_limit <- max(predict(model, data))
   
   lower_limit <- min(predict(model, data))
