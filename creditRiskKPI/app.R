@@ -15,7 +15,7 @@ thematic_shiny(font = "auto")
 ui <-
   fluidPage(
     navbarPage(
-      theme = bslib::bs_theme(bootswatch = 'cosmo'),
+      theme = bslib::bs_theme(bootswatch = 'slate'),
       '',
       tabPanel(div(img(src = "binoculars.png")),
                fluidRow(column(
