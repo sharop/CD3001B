@@ -1,55 +1,3 @@
-## install.packages(c('tidyverse', 'xgboost', 'rsample')) ## update later
-
-library(tidyverse)
-library(xgboost)
-library(rsample)
-library(hrbrthemes)
-
-# leer datos
-
-df_train <- 
-  read_csv('/Users/jd/Documents/CD3001B/profession_classification/train.csv') %>% 
-  select(-Var_1,-Segmentation) %>% 
-  mutate(Ever_Married = recode(Ever_Married, 'No'= 0,'Yes'= 1),
-         Profession = recode(Profession, 'Healthcare'=0,
-                                          'Engineer'=1,     
-                                          'Lawyer'=2,       
-                                          'Entertainment'=3,
-                                          'Artist'=4,
-                                          'Executive'=5,    
-                                          'Doctor'=6, 
-                                          'Homemaker'=7,  
-                                          'Marketing'= 8
-                             )
-         ) %>% 
-  drop_na(Profession)
-
-df_test <- 
-  read_csv('/Users/jd/Documents/CD3001B/profession_classification/test.csv') %>% 
-  select(-Var_1) %>% 
-  mutate(Ever_Married = recode(Ever_Married, 'No'= 0,'Yes'= 1),
-         Profession = recode(Profession, 
-                             'Healthcare'=0,
-                             'Engineer'=1,     
-                             'Lawyer'=2,       
-                             'Entertainment'=3,
-                             'Artist'=4,
-                             'Executive'=5,    
-                             'Doctor'=6, 
-                             'Homemaker'=7,  
-                             'Marketing'= 8
-         )
-  ) %>% 
-  drop_na(Profession)
-
-# pre-process datos (si es necesario)
-
-
-# crear matrices de xgboost
-
-xvars <- (df_train %>% names)[df_train %>% names != 'Profession']
-yvar <- 'Profession'
-
 
 makeXGBMatrix <- function(xvars, yvar, df){
   
@@ -64,15 +12,7 @@ makeXGBMatrix <- function(xvars, yvar, df){
   
 }
 
-xgbTrain <- makeXGBMatrix(xvars=xvars,
-                          yvar=yvar,
-                          df=df_train)
-
-xgbTest <- makeXGBMatrix(xvars=xvars,
-                          yvar=yvar,
-                          df=df_test)
-
-fitxgboost <- function(xgbTrain, xgbTest, iterations){
+fitXGBMulticlass <- function(xgbTrain, xgbTest, iterations){
   
   # iniciar el valor de la métrica del cual partimos (alto para métricas que queremos reducir
   # y viceversa)
@@ -143,23 +83,7 @@ fitxgboost <- function(xgbTrain, xgbTest, iterations){
   return(finalmodel)
 }
 
-# correr la función 
-
-modelo <- fitxgboost(xgbTrain, xgbTest, iterations = 50)
-
-# visualizar el error en la muestra de training y test durante el entrenamiento
-
-modelo$evaluation_log %>% 
-  pivot_longer(cols = c('training_mlogloss','testing_mlogloss'),
-               names_to = 'sample',
-               values_to = 'value') %>% 
-  ggplot(aes(iter, value, group=sample, colour=sample)) +
-  geom_line() +
-  theme_bw()
 
 
-library(caret)
-
-caret::confusionMatrix(as_factor(predict(modelo, xgbTest)), as_factor(df_test$Profession))
 
       

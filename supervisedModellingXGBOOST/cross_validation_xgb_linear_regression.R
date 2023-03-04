@@ -1,29 +1,3 @@
-## install.packages(c('tidyverse', 'xgboost', 'rsample')) ## update later
-
-library(tidyverse)
-library(xgboost)
-library(rsample)
-
-# leer datos
-
-df <- 
-  read_csv('/Users/jd/Documents/CD3001B/income_regression/data.csv')
-
-# pre-process datos (si es necesario)
-
-# dividir train / test 
-
-split <- initial_split(df, prop = 0.80)
-
-train <- training(split)
-test <- testing(split)
-
-# crear matrices de xgboost
-
-xvars <- (df %>% names)[df %>% names != 'fnlwgt']
-yvar <- 'fnlwgt'
-
-
 makeXGBMatrix <- function(xvars, yvar, df){
   
   XGBmatrix <-
@@ -37,15 +11,7 @@ makeXGBMatrix <- function(xvars, yvar, df){
   
 }
 
-xgbTrain <- makeXGBMatrix(xvars=xvars,
-                          yvar=yvar,
-                          df=train)
-
-xgbTest <- makeXGBMatrix(xvars=xvars,
-                          yvar=yvar,
-                          df=test)
-
-fitxgboost <- function(xgbTrain, xgbTest, iterations){
+fitXGBRegression <- function(xgbTrain, xgbTest, iterations){
   
   # iniciar el valor de la métrica del cual partimos (alto para métricas que queremos reducir
   # y viceversa)
@@ -114,19 +80,5 @@ fitxgboost <- function(xgbTrain, xgbTest, iterations){
   return(finalmodel)
 }
 
-# correr la función 
-
-modelo <- fitxgboost(xgbTrain, xgbTest, iterations = 10)
-
-# visualizar el error en la muestra de training y test durante el entrenamiento
-
-modelo$evaluation_log %>% 
-  pivot_longer(cols = c('training_rmse','testing_rmse'),
-               names_to = 'sample',
-               values_to = 'value') %>% 
-  ggplot(aes(iter, value, group=sample, colour=sample)) +
-  geom_line()
 
 
-
-      
